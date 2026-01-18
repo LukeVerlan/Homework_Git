@@ -51,13 +51,13 @@ def mohrs_circle_plot(stress_state, title=""):
 
     t_offset = OFFSET
 
-    fig, ax = plt.subplots(figsize=(5, 5)) 
+    fig, ax = plt.subplots(figsize=(6, 6)) 
 
     stress_units = stress_state['sig_1'][1]
 
     ax.set_title(title, fontweight='bold')
-    ax.set_ylabel(f"Shear Stress (τ), {stress_units}")
-    ax.set_xlabel(f"Normal Stress (σ), {stress_units}")
+    ax.set_ylabel(f"Shear Stress ({sym.tau}), {stress_units}")
+    ax.set_xlabel(f"Normal Stress ({sym.sigma}), {stress_units}")
     
     ax.invert_yaxis()
 
