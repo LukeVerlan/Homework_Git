@@ -1,0 +1,40 @@
+*****************************
+* Lab 3 Synthesis Questions *
+*****************************
+Name(s): Luke Verlangieri
+NetID(s): 
+
+
+-----------------------------------------------------------
+1) Explain: after setting the length to 15 or more, we encounter a segmentation fault. The reason for this is that we overflowed the buffer in fill_array,
+which caused part_2s stored return address to become what the program tried to put into index 14 of the array. The return address goes from 0x40157b, to 0x2c. 
+Looking at the fill_array function, this at an index of 14, we should put 14 * 3 + 2 into the desired location, low and behold, 14 * 3 + 2 is 44, or 0x2c in hex. 
+The specific instruction that causes the segmentation fault is part_2s ret call, when we try to return to the address 0x2c, which doesn't contain real program data, 
+causing a segmentation fault, as we are trying to access memory and run program instructions from an address we shouldn't be accessing.
+-----------------------------------------------------------
+2) Minimum len to cause a segfault: 15
+   Step-by-step calculation: ((Bytes Allocated on the Stack - Bytes to array addr from %rsp)/(sizeof(array type))) + 1 
+   The two instructions that give this away are <part_2> and <part_2+4>, which are sub $0x48,%rsp and lea 0x10(%rsp),%rax respectively. 
+   The reason these instructions are important are that they are the instructions responsible for first allocating space on the stack for the array, and then designating
+   where the array will start within that allocated memory. Because nothing is pushed onto the stack, before <part_2> the only thing in this stack frame is the return address to main. 
+   Therefore, <part_2> defines the total memory in between the stack pointer and the start of the return address. Next, <part_2+4> is the address of the start of the array. This is where
+   fill_array will start writing data into the array, so we need to subtract the amount of bytes this address is above the stack pointer at this instruction from the total allocated bytes. 
+   After that we are left with the amount of bytes between the beginning of the return addr and the start of the array. By dividing it by the size of the type of our array (int in this case),
+   we get the number of types to get right up against the return address, by adding one more type to that we end up writing over the return address, causing our segfault. 
+
+-----------------------------------------------------------
+3) Hacker Reflection:
+   I think the moment I felt like a hacker was most definitely when I was indexing through gdb on the bang part of the lab and I saw the asm layout jump from the instructions addresses to the stack. I found that
+   super super cool and is what inspired me to do the extra credit haha. Seeing this happen was a mix of feelings, primarily "this is cool" because I solved the problem, but also "wow this is scary" because with only a few
+   lines of code I changed a variable in the code I should have never had access to. Just thinking about what can and already has been done with that is baffling, what if that variable I changed was the state enum of a
+   teslas operating system, or something even worse. It's incredible how with only a couple bytes of machine code from a code injection attack the hacker can destroy a program, and change what should be a safe system to a dangerous one.
+-----------------------------------------------------------
+4) Vulnerabilities and Security:
+   After doing this lab I realized just how easy it was to do an attack like this. With only a couple months of knowing how to effectively program at this level, I exploited an unsafe function to execute my own code within the machine, 
+   instead of what should have been ran. I most definitely view computer security differently now, I always envisioned hackers as a kid like they are shown in stock photos. Black hoodies with green ones and zeros flying across their screen.
+   I always thought it was a very complex and impossible task to the average computer user. At the end of the day, while some cyperspaces are obviously very very secure and something like this would never work on them. There are most definitely some
+   programs and websites that are left vulterable to an attack like this. An attack that could leak user information or give the hacker access to confidential information of the program. Cyber security is a serious serious thing. The digital world is a dangerous
+   place and the fact that attacks like this can happen with such ease, and with so few lines of injected code, is insane to me. 
+
+   In terms of my personal ability, I had a lot of fun doing this lab, and so I would find it cool to learn more about other code attacks so that I can think about ways to prevent them when I write software in the future. 
+-----------------------------------------------------------

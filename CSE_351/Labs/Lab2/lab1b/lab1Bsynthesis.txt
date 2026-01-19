@@ -1,0 +1,39 @@
+******************************
+* Lab 1b Synthesis Questions *
+******************************
+Name(s): Luke Verlangieri
+NetID(s): lverl23
+
+
+-----------------------------------------------------------
+1) Benefit 1: With an 8 bit id, we now get access to 256 unique item ids (2^8) instead of 64
+
+   Benefit 2: With an 8 bit integer encoding for storage we can now store 256 item representations per section (2^8)
+
+   Drawback: By doing this we lose knowledge of the orientation of the items (bits) on each shelf, there is no way of knowing
+             where items are on each shelf because we are using an integer encoding instead of "a 1 indicates something 
+             is in this position of the shelf". The store feels a little less like a store and more like a database. In the real world as well,
+             storing 255 of some item in one area is just not possible. Think about 255 TV's or Fridges stacked ontop of eachother at a lowes. 
+
+   Preference & Justification: That being said, the proposed representation is considerably better than the one we worked with in this lab
+                               if I were a store manager, I would want a system that can track as many unique id's as possible, and having the storing 256
+                               representations allows for more items to be stored per section. Having knowledge of the orientation of each item is nice, but having
+                               more freedom of representation is best. EX I would rather have one section with 200 apples than 20 sections with 10. 
+                               
+-----------------------------------------------------------
+2) Difference? Y/N
+
+   Explain: There is a difference, and it all comes down to how this is defined. If y is declared as a signed integer, these representations are equivalent. However, if
+   y is declared as any data type larger than a signed integer, a signed long for example, y = 0xFFFFFFFF is a completely different number than -1. This is instead 0x00000000FFFFFFFF which is 256. 
+   y = -1 tells the compiler to write the signed integer encoding of -1 into whatever data type y is. While y = 0xFFFFFFFF or any hex assignment for that matter is telling the compiler
+   to store the value 0xFFFFFFFF in that memory regardless of what type it is. 
+
+-----------------------------------------------------------
+3) Explain:
+
+   Considerations: Comparing floating points can be difficult because of float rounding, some numbers are unrepresentable by float encoding and therefore 
+   those numbers will be rounded down to the nearest float representable number. The solution to this is a threshold by comparing the difference between two floats.
+   This threshold is entirely dependant on the magnitude of the float values being compared. Floats of very high values will need larger thresholds because the differences
+   between float values at large magnitudes is SIGNIFICANTLY greater than those of low magnitudes.
+
+

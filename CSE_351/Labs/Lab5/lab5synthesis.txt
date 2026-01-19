@@ -1,0 +1,34 @@
+*****************************
+* Lab 5 Synthesis Questions *
+*****************************
+Name(s):  Luke Verlangieri
+NetID(s): lverl23 
+
+
+-----------------------------------------------------------
+1) Alignment: 16 Bytes
+   Reasoning: Using GDB we can find that the distance in bytes between the payload pointers is 32, and that the malloc(16) payload pointer is at an address that ends in 0xb0. The
+   class_grades malloc() points to an address that ends in 0xd0. Because its likely that the minimum block size is 32, a malloc of 32 would reveal the alignment. Because I found
+   the boundary tag size first before this question, I know that the boundary tag size is 8 bytes. Using a malloc of 32, the returned address is the same, ending in 0xb0, but the class grades
+   address is now ending in 0xe0. This means that are 48 bytes between these addresses. I know 32 are allocated memory, and 8 must be the header of the class scores block. Therefore 8 bytes are
+   padding not demanded by the minimum block size, assuming malloc uses an explicit free list, the minimum block size must be 32 bytes due to the boundary tag size. Without this padding, the payload
+   of the class scores malloc would have been at an address ending in 0x8. Because this padding was put in to allign the allocated block to end on a address of lsb 0, the allignment cannot be 8 bytes 
+   and therefore is 16.
+
+-----------------------------------------------------------
+2) Boundary Tag Size: 8 Bytes
+   Reasoning: Looking through GDB, the call to malloc(16) allocated 32 bytes on the heap, and the call to malloc(sizeof(Scores) * 5) allocated 96 bytes on the heap, 
+   This is clear just by looking at the headers of each block. Also by casting both of these pointers to char pointers and using some pointer arithmetic, we find that
+   the payload start addresses are 32 bytes apart. We can dereference the 8 bytes past the 16 allocated bytes to see if they are padding. The 8 bytes after the 16 requested bytes 
+   is 0x0. Which is most definitely not a boundary tag. Because the payloads we 32 bytes apart, the next 8 bytes have to be the header from the class_grades malloc call.
+   So 8 bytes is the boundary tag size. 
+
+-----------------------------------------------------------
+3) Interfaces Question (On the synthesis part of the spec but was not here in this file)
+   In my opinion knowing how malloc and free work under the hood is very useful for a number of reasons. Primarily, knowing this is useful because it removes a layer of mystery between the programmer and the code. 
+   Trusting that malloc and free will do their jobs is one thing but knowing how they work is another. By gaining understanding of the complex details we can use gdb or other debugging tools to find out things issues 
+   with allocation under the hood, how many bytes were expected to be allocated, versus how many actually were. Knowing the structure of memory on the heap and how its handled makes it possible to understand why pointer
+   arithmetic on the heap can be dangerous and lead to segmentation faults or other errors. From lab 5, maybe returning or somehow exposing the implementation of the header will alloy the programmer to know the amount of padding
+   that given malloc calls will generate. Overall, knowing the memory layout of the heap is critical to a good programmers toolbox. 
+
+-----------------------------------------------------------

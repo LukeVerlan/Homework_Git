@@ -1,0 +1,62 @@
+*****************************
+* Lab 4 Synthesis Questions *
+*****************************
+Name(s):  Luke Verlangieri
+NetID(s): lverl23
+
+
+-----------------------------------------------------------
+1) Instructions in the nested loops that access memory
+   lab0.d:    19
+   List of instructions for lab0.d:
+   400987:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
+   40098b:	c7 45 ec 00 00 00 00 	movl   $0x0,-0x14(%rbp)
+   400994:	c7 45 e8 00 00 00 00 	movl   $0x0,-0x18(%rbp)
+   40099d:	c7 45 e4 00 00 00 00 	movl   $0x0,-0x1c(%rbp)
+   4009a6:	8b 55 ec             	mov    -0x14(%rbp),%edx
+   4009a9:	8b 45 e8             	mov    -0x18(%rbp),%eax
+   4009af:	8b 55 e4             	mov    -0x1c(%rbp),%edx
+   4009b2:	8b 4d e8             	mov    -0x18(%rbp),%ecx
+   4009b5:	8b 45 ec             	mov    -0x14(%rbp),%eax
+   4009bc:	e8 78 ff ff ff       	callq  400939 <bigArrayIndex>
+   4009cb:	48 8b 45 d8          	mov    -0x28(%rbp),%rax
+   4009d2:	8b 55 e4             	mov    -0x1c(%rbp),%edx
+   4009d7:	89 10                	mov    %edx,(%rax)
+   4009d9:	83 45 e4 01          	addl   $0x1,-0x1c(%rbp)
+   4009dd:	81 7d e4 f3 01 00 00 	cmpl   $0x1f3,-0x1c(%rbp)
+   4009e6:	83 45 e8 01          	addl   $0x1,-0x18(%rbp)
+   4009ea:	81 7d e8 f3 01 00 00 	cmpl   $0x1f3,-0x18(%rbp)
+   4009f3:	83 45 ec 01          	addl   $0x1,-0x14(%rbp)
+   4009f7:	81 7d ec f3 01 00 00 	cmpl   $0x1f3,-0x14(%rbp)
+
+   lab0opt.d: 1
+   List of instructions for lab0opt.d:
+   4009bb:	89 0c 96             	mov    %ecx,(%rsi,%rdx,4)
+
+-----------------------------------------------------------
+2) Where are the loop variables stored in lab0.d:
+   i: -0x14(%rbp)
+   j: -0x18(%rbp)
+   k: -0x1c(%rbp)
+-----------------------------------------------------------
+3) Corresponding values in lab0opt.d:
+   %edx: This is k from this traversal
+   %ecx: This is sum of i + j + k 
+-----------------------------------------------------------
+4) Effect on number of misses: Increases
+
+   Explain: The number of misses would increase because the number of conflicts would be increased. Every read from A into arr would
+   require two blocks to be pulled into the cache, each guarenteed to have their own conflict misses. Because in our case we know that
+   the matrix falls on an address that ensures only one block is pulled into the cache per filling of arr, we dont have to worry about this. 
+   Overall, pulling more things into the cache will arise more conflicts and therefore more conflict misses. 
+
+-----------------------------------------------------------
+5) Effect on number of misses: Increases
+
+   Explain: Compared to the 64 x 64, which has 2^12 = 4096 ints, this matrix only has 51 x 71 = 3621. Therefore less computations need to be done overall.
+   However, looking specifically at my code, B would end up kicking itself out again because there is 8 ints per block, for the same reason 64x64 required a 4 int per block size, 51x71
+   would have unnecessary conflicts on writes to B. Ignoring this fact the 51x71 case would also have unnecessary conflits at the ends of columns and rows where extra blocks need to be pulled in, since neither
+   51 or 71 is a multiple of the number of ints per block. This results in the cache not being filled up fully. With this wonky size, the cache isnt used to its potential at the edges of the space,
+   therefore increasing misses. 
+
+-----------------------------------------------------------

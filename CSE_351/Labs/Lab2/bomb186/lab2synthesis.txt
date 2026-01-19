@@ -1,0 +1,30 @@
+*****************************
+* Lab 2 Synthesis Questions *
+*****************************
+Name(s):  Luke Verlangieri
+NetID(s): lverl23
+
+
+-----------------------------------------------------------
+1) &value: 12 addresses above the stack pointer (x /d $rsp + 0xc -> 351)
+   &array: 16 addresses above the stack pointer (x /d $rsp + 0x10 -> 2 (the first value of the array))
+-----------------------------------------------------------
+2) Init:   <fillArray+40>
+   Update: <fillArray+146>
+-----------------------------------------------------------
+3) String address: 0x4020a2 
+   Part of memory: Static read only memory
+   Assembly instruction address: <part_2+8>
+-----------------------------------------------------------
+4) Strategy + example: READ THE SPEC. The bulk of my time was spent on the first phase of this project, solely because I was wasting my time
+looking in the strings equals function. After I finally figured out from an ed post tip that you dont need to be in these functions, I solved it in
+5 seconds. Moreover, using the "display" command is super useful to track the registers you care about. This is a general tip that helped me out a lot.
+The layout regs command can be very intimitading so breaking it down to just a few registers was nice. Also speaking things out loud helped me. Assembly
+instructions are not intuitive, so working piece by piece in detail is important. 
+-----------------------------------------------------------
+5) Difficulty + why (past experience): Overall using GDB for the first time was the most difficult part of this assignment. There is so many commands and different 
+things that you can do. In terms of the assembly code that caused me issues, it was tough to identify where my variables were stored, part of my strategy was giving
+input to each phase and trying to find where input was stored, then reading the assembly after that. Moreover I had a hard time working with function calls at first 
+and where values were getting stored, reading the individual register documentation was crucial to having a general idea of where things should be. 
+-----------------------------------------------------------
+

@@ -1,0 +1,202 @@
+ 
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,mathrsfs,graphicx,colortbl,xspace}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\vepsilon}{\varepsilon}
+\newcommand{\bigspace}{\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\usepackage{enumitem}
+\usepackage{tikz}
+\newcommand{\Cross}{\mathbin{\tikz [x=1.4ex,y=1.4ex,line width=.2ex] \draw (0,0) -- (1,1) (0,1) -- (1,0);}}%
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+ 
+\begin{document}
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+ 
+\title{Homework 1}%replace X with the appropriate number
+\author{Luke Verlangieri\\ %replace with your name
+} %if necessary, replace with your course title
+ 
+\maketitle
+
+\begin{exercise}{2.1} %You can use theorem, exercise, problem, or question here.  Modify x.yz to be whatever number you are proving
+Consider the low-speed flight of the Space Shuttle as it is nearing a landing. 
+If the air pressure and temperature at the nose of the shuttle are 
+$1.2 \, \text{atm}$ and $300 \, \text{K}$, respectively, 
+what are the density and specific volume?
+\end{exercise}
+
+\begin{solution}
+\;\newline\newline
+\textbf{Given:}
+\begin{center}
+    P = 1.2 atm, T = 300 K
+\end{center}
+\textbf{Find:}
+\[
+    \rho, \nu
+\]
+\textbf{Properties:}
+\[
+    P = \rho RT, \nu = \frac{1}{\rho}, R_{air} = 287 \frac{\text{J}}{\text{kg K}},
+\]
+\begin{center}
+    1 atm $\approx$ 101325 Pa
+\end{center}
+\textbf{Analysis:} \par \; \newline \indent
+Start by converting to SI units: 1.2 atm = 121590 Pa. Consulting the ideal gas law, 
+$P\nu = RT$ therefore 
+\[
+    \nu = \frac{RT}{P} = \frac{(300 \space \text{K}) (287 \space \frac{\text{J}}{\text{kg K}})}{(121590\space\text{Pa})} 
+    \approx 0.708 ~\mathrm{m^3/kg}
+\]
+and finally
+\[
+    \rho = \frac{1}{\nu} = \frac{1}{0.708~\mathrm{m^3/kg}} \approx 1.412~\mathrm{kg/m^3}
+\]
+\end{solution}
+
+\newpage
+
+\begin{exercise}{2.9}
+Consider a flat surface in an aerodynamic flow (say a flat sidewall of a 
+wind tunnel). The dimensions of this surface are \(3 \, \text{ft}\) in the 
+flow direction (the \(x\) direction) and \(1 \, \text{ft}\) perpendicular to 
+the flow direction (the \(y\) direction). Assume that the pressure 
+distribution (in pounds per square foot) is given by 
+\(p = 2116 - 10x\) and is independent of \(y\). Assume also that the shear 
+stress distribution (in pounds per square foot) is given by 
+\(\tau_w = \tfrac{90}{\sqrt{x+9}}\) and is independent of \(y\) as shown in 
+the figure below. In these expressions, \(x\) is in feet, and \(x=0\) at the 
+front of the surface. Calculate the magnitude and direction of the net 
+aerodynamic force on the surface.
+\end{exercise}
+
+\begin{solution}
+    \;\newline\newline
+    \textbf{Given:}
+    \begin{center}
+        \[ 
+            \tau_w(x) = \frac{90}{\sqrt{x + 9}}, P(x) = 2116 - 10x, L = 3\text{ft}, W = 1\text{ft}
+        \]
+    \end{center}
+    \textbf{Find:}
+    \begin{center}
+        aerodynamic force acting on the surface: magnitude \& direction
+    \end{center}
+    \textbf{Assumptions:}
+    \begin{center}
+        The surface is entirely flat \& no forces act in the y direction
+    \end{center}
+    \textbf{Properties:}
+    \begin{center}
+        \[
+            F = \iint Pn\space da,  A = L*W
+        \]
+    \end{center}
+    \textbf{Analysis:} \par \; \newline
+        Firstly, we can compute the force applied to the surface from both the pressure and shear stress on the surface.
+        The pressure acts normal to the surface, therefore the force acting on the surface is also normal to the surface (-z direction).
+        The shear stress acts in the positive x direction. The magnitude of force applied by the pressure is therefore:
+        \[ 
+            F_p = \int_{0}^{L}\int_{0}^{W}P(x) \cdot da = \int_{0}^{3}(2116 - 10x)\; dx = 6303 \; \text{lbs}
+        \]
+        its direction mirrors that of the pressure, being the -z direction. Next we can analyze the shear stress on the surface:
+        \[ 
+            F_{\tau} = \int_{0}^{L}\int_{0}^{W}\tau(x) \cdot da = \int_{0}^{3}\frac{90}{\sqrt{x + 9}} \; dx = 83.54 \; \text{lbs}
+        \]
+        The direction of this force is in the same direction as the flow/shear stress.\newline
+        Therefore the magnitude of the total aerodynamic force is given by: 
+        \[
+            ||F_{aerodynamic}|| = \sqrt{F_{\tau}^2 + F_p^2} \approx 6304 \; \text{lbs} 
+        \]
+        Breaking this into a vector
+        \[  
+            F_{aerodynamic} = 
+            \begin{bmatrix}
+                83.54 \\
+                0 \\
+                -6303
+            \end{bmatrix}, \; 
+            \boldsymbol{\hat{e}} = \frac{F_{aerodynamic}}{||F_{aerodynamic}||} = 
+            \begin{bmatrix}
+                0.013\\
+                0\\
+                -0.987
+            \end{bmatrix}
+        \]
+\textbf{Results:}
+\begin{center}
+    \[ ||F_{aerodynamic}|| \approx 6304 \; \text{lbs} \;\& \;\boldsymbol{\hat{e}} = 
+        \begin{bmatrix}
+            0.013\\
+            0\\
+            -0.987
+        \end{bmatrix}
+    \]
+\end{center}
+\textbf{Comments:} \; \newline \newline 
+    The pressure causes significantly more stress on the surface than the shear stress. I assume this is because we assume
+    that the flow is only the x direction and that the surface only exists in the xy plane. Once we have a surface that is rotated 
+    out of this plane the flow exists in I expect to see a stronger shear force on the surface.
+\end{solution}
+\pagebreak
+\begin{exercise}{2.14}
+    In  a  gas  turbine  jet  engine, the  pressure of  the  incoming air  is increased by flowing through a compressor; 
+    the air then enters a combusto rthat looks vaguely like a long can (sometimes called the combustion can). 
+    Fuel is injected into the combustor and burns with the air, and then the burned fuel–air mixture exits the combustor at a higher 
+    temperature than  the air coming into the combustor. (Gas turbine jet engines are discussed in Ch. 9).
+    The pressure of the flow through the combustor remains relatively constant; that is, the combustion process is at constant pressure. 
+    Considerthe case where the gas pressure and temperature entering the combustor are $4 \cdot 10^6 \frac{\text{N}}{\text{m}^2} $ and 900 K, 
+    respectively, and the gas temperature exiting the combustor is  1500 K.  
+    Calculate the  gas  density at (a)  the  inlet  to  the combustor and (b) the exit of the combustor.
+    Assume that the specific gas constant for the fuel–air mixture is the same as that for pure air.
+\end{exercise}
+\begin{solution} \; \newline \newline
+    \textbf{Given:}
+    \begin{center}
+        \[ P = const = 4 \cdot 10^6 \frac{\text{N}}{\text{m}^2}, \; T_{inlet} = 900 \; \text{K}, \; T_{outlet} = 1500 \; \text{K}, \; R = R_{air} = 287 \frac{\text{J}}{\text{kg $\cdot$ K}} \]
+    \end{center}
+    \textbf{Find:}
+        \[ \rho_{inlet} \; \& \; \rho_{outlet} \]
+    \textbf{Properties:}
+        \[ P = \rho * RT \] 
+    \textbf{Analysis:}
+        \; \newline\newline\indent We can rewrite this equation $ P = \rho * RT $ to be $ \rho = \frac{P}{RT} $. We can then solve for the inlet and outlet density by simply plugging in values.
+        \[ \rho_{inlet} = \frac{(4 \cdot 10^6 \; \text{Pa})}{(287 \; \frac{\text{J}}{\text{kg $\cdot$ K}})(900 \; \text{K})} = 15.49 \; \frac{\text{kg}}{\text{m}^3}
+        \quad \& \quad 
+        \rho_{outlet} = \frac{(4 \cdot 10^6 \; \text{Pa})}{(287 \; \frac{\text{J}}{\text{kg $\cdot$ K}})(1500 \; \text{K})} = 9.29 \; \frac{\text{kg}}{\text{m}^3}
+        \]
+\end{solution}
+
+
+%Note 1: The * tells LaTeX not to number the lines.  If you remove the *, be sure to remove it below, too.
+%Note 2: Inside the align environment, you do not want to use $-signs.  The reason for this is that this is already a math environment. This is why we have to include \text{} around any text inside the align environment.
+
+% --------------------------------------------------------------
+%     You don't have to mess with anything below this line.
+% --------------------------------------------------------------
+ 
+\end{document}

@@ -1,0 +1,581 @@
+% /c:/AA310/hw3/hw3.tex
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}          % convenient math macros (\norm, \dv, \pdv, etc.)
+\usepackage{siunitx}         % units
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption,subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{pdfpages}
+\geometry{letterpaper,margin=1in}
+
+% Theorem / Problem environment
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}[section]
+
+% Use letters for first-level enumerate items globally: (a), (b), ...
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+% Custom commands useful for orbital mechanics
+\newcommand{\vect}[1]{\mathbf{#1}}        % vector
+\newcommand{\uv}[1]{\hat{\mathbf{#1}}}    % unit vector
+\newcommand{\kep}[1]{\mathrm{#1}}         % keplerian element symbol if needed
+\newcommand{\Rearth}{R_{\oplus}}
+\newcommand{\muEarth}{\mu_{\oplus}}
+\newcommand{\rpm}{r_{\mathrm{pm}}}
+\newcommand{\angmom}{\vect{h}}            % specific angular momentum
+\newcommand{\energy}{\varepsilon}         % specific energy
+\newcommand{\kms}{\frac{km}{s}}
+\newcommand{\delv}{$\Delta V$}
+
+% Shortcuts for common formulas
+\newcommand{\visviva}{v^2 = \mu\!\left(\frac{2}{r}-\frac{1}{a}\right)}
+\newcommand{\rperse}{r = \frac{a(1-e^2)}{1+e\cos\nu}}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\vspace{1em}
+
+\noindent Luke Verlangieri \\
+AA 310 Takehome Final Exam\\
+
+\noindent \textbf{1. ESCAPADE} \\\\
+
+\noindent On 2025-Nov-13 Blue Origins launched its second New Glenn Booster carrying a mission to
+Mars that follows a unique and innovative trajectory. With your knowledge of AA310 you can
+make sense of this new trajectory!
+
+\begin{enumerate}
+    \item New Glenn 2
+    \begin{enumerate}
+        \item The New Glenn 2 booster completed its firing approximately at T+00:03:10, at an
+            altitude of 252,287ft at a speed of 4,674mph. Ignoring the effects of the atmosphere, and
+            assuming that speed is all tangential1, what would be the parameters [a, e, rp, ra, vp, va, b,
+            h, T, en] of the “orbit” for the booster? (if Earth did not get in its way) \\
+
+            Assuming all speed is tangential and there are no effects of the atmosphere, the booster will leave Earth and start at apoapsis
+            of the orbit it enters because this is the furthest it will get away from Earth, given that a booster is intended to return after launching. 
+            Additionally, we know this is apoapsis because the booster does not have enough speed to enter a circular orbit. Therefore it must be at apoapsis.
+            Unlike a certain mission, I will convert the given units to metric to ensure there is no confusion with the
+            functions I've wrote. Here is the code I used to solve this problem.
+
+            \begin{verbatim}
+
+""" Question A """
+
+#Find the orbital parameters of the new glenn rocket booster
+
+#Given 
+alt = 252287 * 0.0003048 # Convert to ft to Km 
+va = 0.00044704 * 4674    # Convert to mph to Km/s 
+mu = pd.MU_EARTH_KM           # Mu Earth
+
+ra = alt + pd.RADIUS_EARTH_KM 
+h = ra*va
+
+#v_t = mu/h(1+ecos(theta)) Curtis 2.48
+# At apoapsis theta = pi, cos theta = 1
+e = 1 - (h*va/mu)
+
+rp = ((1-e)/(1+e)) * ra  # Curtis 2.84
+a = (rp + ra)/2          # Ellipitical Orbits Lecture
+
+booster_state = om.orbital_state(
+  a, e, mu, km=True 
+)
+
+om.print_state(
+  booster_state, label='Booster'
+)   
+
+OUTPUT:
+
+    ============ State of Booster ============
+    e : 0.92932
+    a (km) : 3345.7
+    r_p (km) : 236.47
+    r_a (km) : 6454.9
+    v_p (km/s) : 57.036
+    v_a (km/s) : 2.0895
+    b (km) : 1235.5
+    h (km^2/s) : 13487
+    T (s) : 1925.6
+    spec_e (MJ/kg) : -59.588
+    Mu (km^3/s^2) : 3.9872e+05
+
+            \end{verbatim}
+
+            \item How does the value of e (eccentricity) relate to HW1 Problem 2 (reduced gravity
+            airplane)? \\
+
+            The RGA flies in a sinusoidal parabola in order to create a microgravity experience for the passengers on the plane. This phemonenon
+            works because the acceleration due to gravity on the people inside of the plane causes a parabolic trajectory in free fall from a inital upward 
+            velocity. Therefore, by matching the parabolic freefall trajectory the passengers do not feel an effect of gravity. While apoapsis of a parabolic trajectories cannot
+            physically exist, we can approximate the orbit of the booster to be parabolic (e $\approx$ 1), similarly to the trajectory of the plane. For a short duration the plane and the booster are at a
+            minimum velocity and feel weightless in freefall. Overall, the eccentricity of the booster orbit can be roughly approximated as a parabolic eccentricity, similar to the flight path of the RGA.   \\
+
+            \item Comment on some of the other “interesting” results \\ 
+            
+            The velocity at periapsis is absolutely enormus. being almost 60 $\frac{km}{s}$ and the distance at periapsis is a short 240 km. This goes to show that for high eccentricity orbits the
+            speeds at periapsis and apoapsis are so greatly different because of the amount of time the object spends accelerating toward the earth while moving in the direction of the Earth. A lot of speed 
+            can be built. Moreover even though the velocity at periapsis is so great, the specific energy of the system is still very negative. This is because the magnitude of specific energy has to do with 
+            how much of an effect the gravity the planet has on the object. Because the specific energy is very negative, being almost -60 $\frac{MJ}{kg}$, the object does not have enough energy to escape Earth. 
+            This goes to show that velocity at periapsis and velocities in general are NOT representative of an objects orbital specific energy, it all has to do with the distances from the planet. This can be seen by
+            checking the state of the circular orbit at this altitude. That state has a velocity of about 7.85 $\frac{Km}{s}$, and a specific energy of -30 $\frac{MJ}{kg}$. The velocity at periapsis of our "orbit" is about
+            8x that amount, but the specific energy is twice as negative as the circular orbit. \\
+
+    \end{enumerate}
+    \item The "parking" orbit.
+    \begin{enumerate}
+        \item   ESCAPADE, an un-manned mission, will not have a traditional circular parking orbit. It
+                will “loiter” around the Earth-Sun L2 Lagrangian point. That point is approximately 1.5
+                million kilometers beyond the Earth. \\
+
+                i. Draw (by hand, computer, or plot if you want) an approximate figure of the L2
+                Lagrangian point showing the Earth, the Sun, and the L2 point.
+
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=\textwidth]{flicks/L2EarthSun.jpg}
+                    \caption{Distances between Sun, Earth, L2}
+                    \label{fig:1}
+                \end{figure}
+
+                Early November is approximately halfway between the autumn equinox and the winter solstice, therefore Earth and L2 are approximately 45 degrees above the horizontal, defining the horizontal to be through the sun 
+                in the direction of Earth's vernal equinox. \\
+                
+        \item   Looking online 1.5 million kilometers is exactly the size of the earths sphere of influence, therefore this calculation can be one using mu of Earth.
+                We want to be at a mimimum speed at this point, so this must be apoapsis of the orbit. Therefore $r_a = 1.5 * 10^6 \; km$. Additionally, periapsis of the ESCAPADE 
+                is the apoapsis of the booster, therefore $r_p = r_{a, booster}$. Here is the code I used to solve this problem.
+
+                \begin{verbatim}
+rp = ra            #Booster ra
+ra = 1.5 * (10**6) #km 
+
+e = (ra - rp)/(ra+rp) # Curtis 2.84
+a = (rp+ra)/2         # Semi-Major
+
+mu = pd.MU_EARTH_KM
+
+l2_state = om.orbital_state(
+  a,e, mu, km=True
+)
+
+om.print_state(
+  l2_state, label='Lagrange Orbit'
+)
+
+OUTPUT:
+
+    ============ State of Lagrange Orbit ============
+    e : 0.99143
+    a (km) : 7.5323e+05
+    r_p (km) : 6454.9
+    r_a (km) : 1.5e+06
+    v_p (km/s) : 11.091
+    v_a (km/s) : 0.047728
+    b (km) : 98399
+    h (km^2/s) : 71592
+    T (s) : 6.5048e+06
+    spec_e (MJ/kg) : -0.26468
+    Mu (km^3/s^2) : 3.9872e+05
+                \end{verbatim}
+
+                From this output, we can see that the eccentricity of this orbit is 0.99143, and therefore this is the eccentricity of the oribit we need to reach the l2 point. 
+                
+                \item The argument of perigee of the mission was  $-179.4^\circ$. Why?
+                
+                Consider this diagram from the Lecture slides
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=0.5\textwidth]{flicks/Equinox_map.png}
+                    \caption{$\hat{i}$ direction during rotation around the sun}
+                    \label{fig:2}    
+                \end{figure}
+
+                The argument of perigee $\omega$ is $-179.4^\circ$ because perigee of the transfer orbit to L2 points in the direction of the sun. From the perspective of the inertial frame, the mission was launched in November which means the 
+                $\hat{i}$ direction is about $-135^\circ$ away from the direction to perigee (pointing toward the sun). The argument of perigee is defined as the angle between the node line and the direction of perigee. Perigee must point toward the Sun in order for apogee to be at L2, 
+                and because we leave Earth at perigee of the transfer orbit the orbital plane is defined at perigee and therefore the node line is along the direction of perigee. Therefore in order for $\omega$ to be about $-180^\circ$, RAAN must be roughly $45^\circ$ as RAAN marks the angle between the Node line and $\hat{i}$ direction. Importantly, the combination of RAAN and argument of perigee add up to the angle between $\hat{i}$ direction and the direction 
+                of perigee. Overall, $\omega$ is about $-180^\circ$ because the direction of perigee opposes the direction of the L2 point, which is at apoapsis.
+                Of course this is a real mission, so the value is not exactly $180^\circ$, but very close to that. Here is an image of what I mean for reference.
+
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=0.5\textwidth]{flicks/iiidrawing.png}
+                    \caption{Reference Drawing}
+                    \label{fig:4}
+                \end{figure}
+
+                \item Given that the booster sped ESCAPADE to 4,674mph, how much more $\Delta v$ must the
+                      2nd stage impart to get it to L2 from 200km altitude2? (In other words: what velocity must
+                      ESCAPADE have at the end of the 2nd stage firing to reach L2?) - Do this approximately
+                      with the trajectory from point (iii) above. \\
+
+                      Knowing that the booster did not make it by a long shot, there needs to be a significant $\Delta V$ done by stage 2 in order to get the vessel into the orbit that will take the satellite to the L2 point.
+                      Because I found the state of the orbit from a previous question, the required $\Delta V$ is just the velocity at periapsis of the orbit found minus the current velocity. That is given by
+                      \begin{verbatim}
+va # defined from earlier question
+
+print(f'Needed Dv {l2_state['v_p (km/s)'] - va:.5g} km/s')
+
+OUTPUT: 
+    
+    Needed Dv 9.0016 km/s
+                      \end{verbatim}
+    \end{enumerate}
+
+    \item Alligning the Orbit \\\\
+    New Glenn launched at an inclination of \( 29.5^\circ \). The Earth equator is inclined \( 23.45^\circ \) to
+the Earth-Sun orbital plane. For simplicity, lets assume that the correction is the
+difference between those: \( 6.05^\circ \).\\\\
+    Assuming that the Earth-Sun inclination correction must happen on its own (not at the
+same time as the other $\Delta V$'s):
+    \begin{enumerate}
+        \item What is the \(\Delta v\)'s required if it is done “immediately” after reaching \( v_{esc} \)? \\
+
+        This assumes that the plane change happens at the ascending node, given that we are going to the edge of the sphere of influence, we reach the escape velocity right after the burn 
+        from stage 2. The escape velocity at this point is given by $v_{esc} = \sqrt{\frac{2\mu}{r}}$. Using 200km as the radius at periapsis, escape velocity is 
+        \begin{verbatim}
+# Assuming that we maintain the same speed at 200 km that the booster delievered
+v_esc = om.get_v_esc(
+  mu, pd.RADIUS_EARTH_KM + 200
+)
+
+print(f'\nEscape Velocity {v_esc:.5f} km/s')
+
+OUTPUT:
+
+    Escape Velocity 11.01 km/s
+        \end{verbatim}
+        Then assuming that $v_{esc}$ is maintained after the change of plane (needed to reach L2), we can use this equation for change in inclinination.
+        \begin{verbatim}
+# Assumes a plane change maintaining the speed before and after 
+# Uses Curtis 6.28
+def inclination_change(v, inclination, deg=True):
+
+  if deg:
+    inclination = np.deg2rad(inclination)
+  
+  return 2 * v * math.sin(inclination/2)
+        \end{verbatim} 
+        Then using this function we can solve for the change in inclination angle.
+        \begin{verbatim}
+# Determine the plane change
+dv_plane_change = om.inclination_change(
+  v_esc, i
+)
+
+print(f'Plane Change Dv {dv_plane_change:.5g} km/s')
+
+OUTPUT:
+
+    Plane Change Dv 1.1621 km/s
+        \end{verbatim}
+        \item What if it could be done immediately after Stage 1 separation? \\
+
+        Again assuming that the plane change is done completely separate to the other dv's required to enter the orbit to L2, we are changing planes at the speed left off by the booster.
+        \begin{verbatim}
+va # From the first question 
+
+dv_plane_change_stage_1 = om.inclination_change(
+  va, i
+)
+
+print(f'Plane Change Dv {dv_plane_change_stage_1:.5g} km/s')
+
+OUTPUT:
+    
+    Plane Change Dv 0.22053 km/s
+        \end{verbatim}
+    \end{enumerate}
+    \item Waiting for Mars\\\\
+    Escapade will wait at L2 for a whole year, before leaving to Mars in November 2026.
+Approximating the wait as 365 days: where was Mars with respect to Earth when New
+Glenn 2 launched? Provide both the math and a drawing (by hand, using the computer,
+plot if you want). (Only use information in this question and previous AA310 work, you
+may not use an online search, simulator, or any other method.) \\ Assuming we are doing a hohmann transfer from Earth to Mars, we first need to find the difference
+in phase angle between Earth and Mars at the beginning of the hohmann transfer, then we can add the change in phase that happens after Earth completes a revolution around the Sun. Lastly, we add the 
+time it takes to get to L2 from New Glenn launch. 
+
+\begin{verbatim}
+# Get the transfer orbit from Earth to Mars
+
+rp = pd.SUN_EARTH_KM + (1.5 * (10**6))
+ra = pd.SUN_MARS_KM 
+
+e = (ra - rp)/(rp + ra) # Curtis 2.84
+a = (rp + ra)/2         # Ellicpitial Orbit Lecture Slides
+
+xfer_state = om.orbital_state(
+  a,e,pd.MU_SUN_KM, km=True
+)
+
+om.print_state(
+  xfer_state
+)
+
+T_mars = om.get_period(pd.SUN_MARS_KM, pd.MU_SUN_KM)
+w_mars = (2*math.pi)/T_mars
+
+T_earth = 365 * 3600 * 24
+w_earth = (2*math.pi)/T_earth
+
+# Get angular distance covered by mars in one Earth year
+# Add (2pi - this to the total distance, earth "gains" this much
+# phase per year on mars)
+phi_year = (math.pi * 2) - (w_mars * T_earth)
+
+print(f'\nPhase Difference Created by waiting a year {np.rad2deg(phi_year):.5g} Deg')
+
+# Get phase difference created while waiting for hohmann transfer
+phi_hohmann = om.get_phase_difference_in_out(
+  xfer_state['T (s)'], w_mars
+)
+
+print(f'\nPhase Difference Created by hohmann {np.rad2deg(phi_hohmann):.5g} Deg')
+
+print((l2_state['T (s)']/(2*3600*24)))  
+
+l2_state # from previous question
+
+# Phase difference created during time getting to L2
+phi_l2 = (w_earth * l2_state['T (s)']/2) - (w_mars * l2_state['T (s)']/2)
+
+print(f'\nPhase Difference Created by waiting for L2 {np.rad2deg(phi_l2):.5g} Deg')
+
+# Phase difference created during the 3 minutes and 10 seconds of stage 1
+phi_launch = (w_earth * 190) - (w_mars * 190)
+
+print(f'\nPhase Difference Created by waiting for launch {np.rad2deg(phi_launch):.5g} Deg')
+
+phi = phi_launch + phi_l2 + phi_year + phi_hohmann
+
+print(f'\nPhase Difference at time of New Glenn Launch {np.rad2deg(phi):.5g} Deg')
+
+OUTPUT:
+
+    Phase Difference Created by waiting a year 168.65 Deg
+
+    Phase Difference Created by hohmann 43.52 Deg
+
+    Phase Difference Created by waiting for L2 17.393 Deg
+
+    Phase Difference Created by waiting for launch 0.0010161 Deg
+
+    Phase Difference at time of New Glenn Launch 229.56 Deg
+
+Helpers
+
+# Get the phase difference L11, Interplanetary Transfers 
+# returns in radians
+def get_phase_difference_in_out(Txfer, n):
+  t = Txfer/2
+  phi_dept = math.pi - (n*t)
+  return phi_dept
+
+# Get the period
+def get_period(a,mu):
+  T = (2*np.pi/np.sqrt(mu))*(a**(3/2)) # Curtis 2.83
+  return T
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{flicks/Delta_Phi.pdf}
+    \caption{Phase Difference Diagram}
+\end{figure}
+
+\item Using Earth to go to Mars \\
+After waiting around L2 for a year, ESCAPADE will do a fly-by of Earth to enter its
+Hohmann trajectory to Mars
+
+\begin{enumerate}
+    \item If we assume a straight trajectory from L2 back to Earth5, then Earth needs to impart a
+turn angle of \( \delta = \pi/2 \). What is the eccentricity needed for this turn? \\
+
+Here is the code I used to solve this 
+
+\begin{verbatim}
+delta = math.pi/2
+
+# Turning angle is the change in angle between V_inf after a planetary fly by
+e = om.get_eccentricity_turn_angle(delta, deg=False)
+print(f'Eccentricity of the Hyperbolic Orbit {e:.5g}')
+
+OUTPUT:
+
+    Eccentricity of the Hyperbolic Orbit 1.4142
+
+HELPER:
+    
+def get_eccentricity_turn_angle(delta, deg=True):
+
+  if deg:
+    delta = np.deg2rad(delta)
+
+  # Curtis 2.100
+  return 1/(math.sin(delta/2))
+\end{verbatim}
+
+\item To minimize the possibilities of ESCAPADE affecting current satellites, it cannot come
+closer than 40,000km above the surface of the Earth6 (farther away than GEO satellites).\\\\ 
+What is all the other information about the orbit? (\( r_p \), \( r_a \), \( a \), \( b \) (= \( \Delta \)), \( h \), \( \theta_\infty \), \( \beta \), \( \delta \), \( v_\infty \), \( v_{esc} \),
+\( v_p \), \( \epsilon \))\\\\
+
+Given the closest the satellite can get to Earth is 40000km, this must be periapsis altitude of the hyperbolic flyby orbit. Because we now have e and rp, the other parameters of the orbit can be solved used the hyperbolic state function.
+
+\begin{verbatim}
+# Given 
+rp = 40000 + pd.RADIUS_EARTH_KM # km
+
+mu = pd.MU_EARTH_KM
+
+flyby = om.hyperbolic_state(
+  e, rp, mu
+)
+
+om.print_state(flyby, label='Hyperbolic')
+
+OUTPUT:
+
+    ============ State of Hyperbolic ============
+    e : 1.4142
+    rp (km) : 46378
+    ra (km) : -2.7031e+05
+    a (km) : 1.1197e+05
+    b (km) : 1.1197e+05
+    h (km^2/s) : 2.1129e+05
+    theta inf (deg) : 135
+    Beta (deg) : 45
+    delta (deg) : 90
+    V_inf (km/s) : 1.8871
+    V_esc (km/s) : 4.1466
+    V_p (km/s) : 4.5558
+    epsilon (MJ/kg) : 1.7805
+
+\end{verbatim}
+
+\item What does $v_{\inf}$ have to do with ESCAPADE? \\\\
+
+$v_{\inf}$ is the speed that ESCAPADE leaves Earth's sphere of influence with after the planetary flyby relative to Earth. Because we know the speed of Earth and the speed of the satellite relative to Earth, we can find the speed of
+the satellite in the heliocentric frame of reference. For lack of a better word, $v_{\inf}$ is critical to determining the speed of the object during an interplanetary transfer, and in this case it tells us the speed 
+of the satellite relative to Earth after escaping the SOI. \\
+
+\item Comment on the aiming radius. \\\\
+
+There are a couple of cool things about the aiming radius (b), foremost the aiming radius is equal to the semi-major axis of the orbit! This is because the turn angle is $90^\circ$ and therefore $\beta$ is 
+$45^\circ$, because a and b make up the legs of the triangle with the angle $90^\circ - \beta$, they must be equal! Moreover, in this case the aiming radius is quite large, being almost 17.6 times larger than the radius of Earth (due to the 
+constraints placed by avoiding satellites) the satellite has to aim really far from Earth, which makes the period longer, therefore this large aiming radius reveals that it takes more time to turn than if we did not have to avoid the satellites. \\
+
+\item  Would this maneuver actually get you on the way to Mars? If yes: show that you have
+everything you need; if not, show what is missing. \\\\ 
+
+Because the turn angle is $90^\circ$ and L2 is along the same line as the Earth and Sun, after a turn of 90 degrees $v_{inf}$ is in the same direction as the planets velocity about the Sun. $v_{sat\_sun}$ is given by $v_{planet\_sun} + v_{\inf}$, as $v_{\inf}$ is taken relative 
+to the planets frame of reference, therefore adding the speed of the planet to the speed relative to the planet yeilds the speed of the satellite in the heliocentric frame. In order for this to be enough speed to get to Mars, this speed must be greather than or equal to the speed
+at periapsis of the transfer orbit. Hence
+
+\begin{verbatim}
+# Get the transfer orbit from Earth to Mars
+rp = pd.SUN_EARTH_KM
+ra = pd.SUN_MARS_KM 
+
+e = (ra - rp)/(rp + ra) # Curtis 2.84
+a = (rp + ra)/2         # Ellicpitial Orbit Lecture Slides
+
+xfer_state = om.orbital_state(
+  a,e,pd.MU_SUN_KM, km=True
+)
+
+om.print_state(
+  xfer_state
+)
+
+# Speed leaving Earth in heliocentric frame
+v_sat_sun  = flyby['V_inf (km/s)'] + pd.V_EARTH_SUN_KM
+
+# Speed required to enter mars transfer orbit
+v_required = xfer_state['v_p (km/s)']
+
+print(f'Speed leaving Earth {v_sat_sun:.5g} km/s, '
+f'Speed required to enter Xfer orbit {v_required:.5g} km/s')
+
+OUTPUT:
+
+    Speed leaving Earth 31.676 km/s, Speed required to enter Xfer orbit 32.733 km/s
+\end{verbatim}
+As can be seen we do not leave Earth with enough speed to make it Mars on the Hohmann transfer orbit. We need to do a \delv to get the speed to get there. The magnitude of the \delv is the difference
+between these speeds.
+\begin{verbatim}
+dv_req = v_required - v_sat_sun 
+
+print(f'Required DV to enter Xfer orbit {dv_req:.5g} km/s')
+
+OUTPUT:
+
+    Required DV to enter Xfer orbit 1.0568 km/s
+\end{verbatim}
+\end{enumerate}
+\end{enumerate}
+
+\clearpage
+
+\noindent \textbf{2. The assumptions}\\
+
+\noindent \textbf{\underline{Keplerian Two-Body Problem}} \\
+
+\begin{enumerate}
+    \item This assumption entails no irregular shapes, this means that Earth and every planet is a perfect circle and can be considered a point mass. Additionally, there are no perturbations from other bodies.
+    \item Low and behold, planets are not perfect spheres and cannot be approximated as point masses because of their irregular shapes. The Earth for example is an oblate-elipsoid. This causes the force of gravity to vary 
+          depending on an objects location relative to equator, as further from the equator the force of gravity gets stronger for the same altitude moving toward the poles. This results in J2 effects, which is the gradual change of orbits 
+          due to these strange effects. Moreover throughout this class we have only assumed two-bodies in a significant amount of scenarios. This includes orbits around Earth, interplanetary orbits etc. In actuality, the other planets have an effect
+          on the orbits of objects, the moon will have an effect on a satellite orbiting Earth, over time this will impact its orbit. The same is true for Interplanetary transfers, the other planets will have some effect on the force of gravity experienced by the satellite.
+          Overall, this part of the assumption entails that only the central mass has an effect on the orbit.
+    \item This assumption will most definitely need to be accounted for in the real world of orbital mechanics, an awkwardly shifting orbit makes multiple things more difficult, meeting things in orbit, i.e. timing missions to the ISS. This is significantly different from what we have used in class,
+          given that it has been assumed that there will be no effects to RAAN and Argument of Perigee with time, an orbital parameter changing with time significantly affects mission planning, especially the timing of launches and rendezvous. High altitude orbits closer to the moon
+          need to account for the shift that the moons gravity will impose on the object flying through that orbit. Specifically for satellites observing the poles as mentioned in class inclination is chosen meticulously to diminish J2 effects, as over time the J2 effects will progressively move
+          satellite away from the poles. Overall, the perturbations that exist in the real world have significant effects on the long term behavior of missions due to forces that are both hard to model as well as hard to fully remove from the problem. 
+\end{enumerate} \; \\ 
+
+\noindent \textbf{\underline{No atmosphere}} \\
+
+\begin{enumerate}
+    \item This assumption is the idea that planets carry no atmosphere. This is something that was particularly important for departure and arrival to planets.
+    \item In the problem statement of just about every problem having to do with arriving on Mars or Earth, we were instructed to assume no atmosphere. Foremost, the atmosphere plays a huge role on liftoff, as drag acts on the vehicle leaving Earth in a very significant way. 
+          As we saw in the mission project, liftoff always took the most amount of fuel for the mission because of the sheer quantity of fuel required to both achieve the needed \delv while also carrying the fuel for the remainder of the mission. From AA311 this quarter we have learned 
+          as a cohort a significant amount about the impact of drag on a vehicle. Importantly, drag features a velocity squared term. As rockets are very fast, drag is very significant on a rocket. More drag means more fuel is needed to be burned in order to overcome drag and generate the thrust to 
+          exit the atmosphere. Additionally for very low Earth orbits drag will gradually effect objects in orbit because while there is not much atmosphere there still is some, enough to slow an object down over time. Additionally the atmosphere is very helpful for arrival, in the Mission Project this allowed 
+          for us to utilize the atmosphere upon arrival which significantly reduced fuel consumption for arrival. This also checks out with physics, for the same reason as drag is hurtful on departure, drag is very useful upon arrival because it can help perform \delv.
+    \item Accounting for atmospheric effects at the industry level of orbital mechanics is absolutely unavoidable. There is no way that there will be a time where hurtful drag on departure and helpful drag is not heavily considered for the amount of fuel leaving Earth for the mission. Maximizing what is available to us 
+          is critical to an efficient mission and is a big part of why most missions are even possible in the first place. This assumption makes it easier to calculate \delv because otherwise departure and arrival become more than just considering what mass needs to leave or land and instead accounting for the 
+          affect of the atmosphere ontop of that. From a technical standpoint, accounting for atmospheric effects changes the liftoff and arrival to the simplest parts of the mission to some of the most technical because of the significance of atmospheric drag. A quick google search will tell you that drag will have an effect of about 3-4\% on the liftoff. These 
+          numbers pile up, and are taken with mission ready rockets that are optimized already for aerodyanmics. Even so 3-4\% of a 10T mission is 300-400kg. Which is not completely negligible fuel that needs to be launched off of the planet. 
+\end{enumerate}
+
+\noindent \textbf{\underline{Impulsive Maneuvers}} \\
+
+\begin{enumerate}
+    \item This assumption entails that the idea that burns can be approximated as fully Impulsive moves. i.e. position right before the burn is the same right after the burn.
+    \item This assumption assumes that no position is changed because of a \delv this is a big assumption because position most definitely changes with time. No change in velocity is truly instantaneous. This assumption has been a relatively good assumption for the duration of this class because the amount of time that a \delv takes is
+          approximately zero time relative to the duration of the mission. Consider a hohmann transfer. The \delv to go to depart Earth into the transfer to LEO and back was around 7.5 km/s, even if in the scope of the mission the amount of time it takes to change the velocity that much is significant, a large distance will be traveled during this time. accelerating to 
+          that speed takes some serious distance as 7.5 km/s is not slow. The position will change aggressively, and for missions requiring very high accuracy of orbits, you will miss your orbit for the fact that perigee of your transfer orbit cannot be approximated to be the surface of the Earth because you travel hundreds of kilometers into space in order to reach the
+          speed required to enter the transfer orbit. Overall, For missions requiring high-precision orbital insertion, such as rendezvous, hohmann transfers, or Lagrange point insertions, treating burns as impulsive can introduce substantial errors in orbital position and timing.
+    \item This assumption absolutely needs to be addressed when considering a mission at the highest level because by not addressing it the accuracy and timing of missions becomes very technical at this level. An overshoot or mistiming by even a few minutes because of an assumed impulsive maneuver can and will be the difference between a successful mission to the ISS and one that
+          does not reach the ISS. For high fidelity missions costing billions of dollars the impulsive maneuvers assumption is simply not accurate enough to be confident in the performance and orbit of the vehicle. 
+\end{enumerate}
+% Bibliography placeholder (if needed)
+%\bibliographystyle{plain}
+%\bibliography{refs}
+
+\end{document}

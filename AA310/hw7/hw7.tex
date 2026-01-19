@@ -1,0 +1,132 @@
+% /c:/AA310/hw3/hw3.tex
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}          % convenient math macros (\norm, \dv, \pdv, etc.)
+\usepackage{siunitx}         % units
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption,subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{amsmath}
+\usepackage{pdfpages}
+\usepackage{pdflscape}
+\geometry{letterpaper,margin=1in}
+
+% Theorem / Problem environment
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}[section]
+
+% Use letters for first-level enumerate items globally: (a), (b), ...
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+% Custom commands useful for orbital mechanics
+\newcommand{\vect}[1]{\mathbf{#1}}        % vector
+\newcommand{\uv}[1]{\hat{\mathbf{#1}}}    % unit vector
+\newcommand{\kep}[1]{\mathrm{#1}}         % keplerian element symbol if needed
+\newcommand{\Rearth}{R_{\oplus}}
+\newcommand{\muEarth}{\mu_{\oplus}}
+\newcommand{\rpm}{r_{\mathrm{pm}}}
+\newcommand{\angmom}{\vect{h}}            % specific angular momentum
+\newcommand{\energy}{\varepsilon}         % specific energy
+
+% Shortcuts for common formulas
+\newcommand{\visviva}{v^2 = \mu\!\left(\frac{2}{r}-\frac{1}{a}\right)}
+\newcommand{\rperse}{r = \frac{a(1-e^2)}{1+e\cos\nu}}
+\newcommand{\degr}{^\circ}
+\newcommand{\ehat}{$\hat{e}$ }
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\vspace{1em}
+
+
+\noindent Luke Verlangieri \\
+AA310 HW7 \\
+
+\noindent \textbf{1.} \\
+
+This section of the homework had us change orbital parameters and settings in order to clearly see J2 effects on a satellite orbiting earth. Foremost, 
+the option "ECEF" locks the camera with the rotation of the earth, so I changed that to be "Inertial" per the documentation for the module, done with this statement.
+\begin{verbatim}
+v = satelliteScenarioViewer(sc, "PlaybackSpeedMultiplier", 50, "CameraReferenceFrame",
+ "Inertial", "ShowDetails", false);
+\end{verbatim} 
+This unlocks the camera from the rotation of the Earth, in doing so, seeing the change of an orbit over time is more evident and comprehendable, as geocentric coordinates do not change with the rotation of the Earth. 
+Considering the J2 perturbation equations
+
+\[ 
+\dot{\Omega} = -\left[\frac{3}{2} \left(\sqrt{\mu} J_2 R^2\right) / \left((1-e^2)^2 a^{7/2}\right)\right] \cos i \quad 
+\dot{\omega} = -\left[\frac{3}{2} \left(\sqrt{\mu} J_2 R^2\right) / \left((1-e^2)^2 a^{7/2}\right)\right] \left(\frac{5}{2} \sin^2 i - 2\right)
+\]
+
+The orbital parameters with the largest impact on the J2 effects are inclination (i), eccentricity (e), and semi-major axis (a). So I will be focusing on those in my analysis
+of the software. Moreover, while the ground tracks are cool to see, they don't clearly display the change of the orbit because of the rotation of the earth. Reading through the documentation, and with 
+some help from the internet, I found the orbit object, which allows me to plot the orbit, the code for that is
+\begin{verbatim}
+o = orbit(sat, "LeadTime", leadTime, "TrailTime", trailTime);
+\end{verbatim}
+below the groundTracks object. Because the rotation of the Earth has no effect on where the node line should be and the argument of periapsis, Therefore plotting the orbit is very useful. 
+Below is the base case using the simulation without changing the orbital simulation parameters. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{flicks/basecase.png}
+    \caption{Base Case}
+    \label{fig:1}
+\end{figure}
+
+Changing the eccentricity is crucial to exposing if there are J2 effects as well, because a circular orbit does not have a clear periapsis and therefore a shift of the argument of the true anomaly will 
+be impossible to see. To make it clear where periapsis is, I change the eccentricity to be 0.5, to put the satellite on a high eccentricity orbit. I also left the inclination where it is for this case.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{flicks/Orange.png}
+    \caption{$\Omega = 0 $, $\omega = 0$, $i=51.6^\circ$, $e=0.5$}
+    \label{fig:2}
+\end{figure}
+
+Because our reference is inertial, we can see the rotation of the Earth, the orbit is clearly not shifting. The node line does not change throughout the duration of this simulation, meaning that the RAAN is constant, and that periapsis is
+not shifting either, meaning that the argument of perigee is also constant. Because both of these are constant, $\dot{\Omega}$ and $\dot{\omega}$ are both 0. Therefore \textbf{the simulation does not} feature J2 effects. \\
+
+To confirm this, I did some additional research and reading on the documentation of the satellite toolbox, where I was lead to the mathworks help website, \hyperref{https://www.mathworks.com/matlabcentral/answers/1845413-where-is-a-simple-j2-propagator-within-satellite-function-of-the-aerospace-toolbox}{J2 Simulation}{MATHWORKS}{link}.
+I found in the documentation of satellite scenario the reference to numericalPropagator (part of the aerospace toolbox \hyperref{https://www.mathworks.com/help/aerotbx/ug/satellitescenario.numericalpropagator.html}{numericalPropagator}{MATHWORKS}{link}) object, and it looks like here you can set the orbitalPropogation to be an 
+"oblate-elipsoid", i.e. What causes J2 effects. Only after changing the parameters to this and utilzing the other toolbox are J2 effects introduced. The "two-body-keplerian" propagator that was set in the base code assumes a perfectly spherical Earth, and therefore no J2 effects. Running the sample code from that thread I found online, we can see what J2 effects look like 
+on the orbit. Its pretty awesome! Keeping in mind that the above (and below) photos were taking at the \textbf{very end} of the simulation, after the trail had time to progate. This is what J2 effects actually look like. In this simulation, there is an i of $90^\circ$ and a high eccentricity. Therefore $\dot{\Omega}$ will be zero, however, $\dot{\omega}$ is not. Which is why we
+see periapsis rotate and the orbit change orientation in the inertial frame of reference.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{flicks/J2effects.png}
+    \caption{e = 0.7, i = $90^\circ$, $\Omega = 0^\circ$, $\omega = 0^\circ$}
+    \label{fig:3}
+\end{figure}
+
+Here is one with an inclination of 45 to see the RAAN change as well. We can see that the looking directly through the "center" of the shape created by the orbit, on the left side the orbit goes "down" and on the right it goes "up". That's because the node line is changing 
+in the geocentric frame. Pretty neat.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{flicks/Coolthing.png}
+    \caption{e = 0.7, i = $45^\circ$, $\Omega = 0^\circ$, $\omega = 0^\circ$}
+    \label{fig:4}
+\end{figure}
+
+\includepdf[pages=-,landscape=True, angle=90]{flicks/part2.pdf}
+
+
+% Bibliography placeholder (if needed)
+%\bibliographystyle{plain}
+%\bibliography{refs}
+
+\end{document}

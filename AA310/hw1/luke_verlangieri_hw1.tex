@@ -1,0 +1,223 @@
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,mathrsfs,graphicx,colortbl,xspace,pdfpages}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\vepsilon}{\varepsilon}
+\newcommand{\bigspace}{\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\usepackage{enumitem}
+\usepackage{tikz}
+\newcommand{\Cross}{\mathbin{\tikz [x=1.4ex,y=1.4ex,line width=.2ex] \draw (0,0) -- (1,1) (0,1) -- (1,0);}}%
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+ 
+\begin{document}
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+\title{Homework 1}%replace X with the appropriate number
+\author{Luke Verlangieri\\ %replace with your name
+} %if necessary, replace with your course title
+ 
+\maketitle
+\noindent \textbf{1. Vector Algebra: }
+\begin{verbatim}
+a.
+#returns a float(scalar placeholder)
+def dot_product(vector_a, vector_b) -> float:  
+    # Vectors must be same length
+    if len(vector_a) != len(vector_b): raise IndexError
+    product = 0 #init sum
+    #add the product of all vars
+    for var in range(len(vector_a)): product += vector_a[var] * vector_b[var]
+    return product	#return the value
+
+#indexes
+# - 0 : x 
+# - 1 : y
+# - 2 : z
+def cross_product(vector_a, vector_b) -> list: #returns a list vector
+    #Vectors must be of R_3 and same length
+    if len(vector_a) != len(vector_b) or len(vector_b) != 3 : raise IndexError
+    return 	[
+        vector_a[1]*vector_b[2] - vector_a[2]*vector_b[1], #(a_y*b_z - a_z*b_y)
+        vector_b[0]*vector_a[2] - vector_a[0]*vector_b[2], #(b_x*a_z - a_x*b_z)
+        vector_a[0]*vector_b[1] - vector_b[0]*vector_a[1]  #(a_x*b_y - b_x*a_y)
+    ]
+b. 
+#returns a scalar
+#performs a dot product operation of A on the resulting cross product of B X C 
+def scalar_triple_product(a,b,c) -> float: 
+    return dot_product(a, cross_product(b,c))
+
+#returns a vector
+#performs a cross product operation of A on the resulting cross product of B X C 
+def vector_triple_product(a,b,c) -> list: 
+    return cross_product(a, cross_product(b,c))
+
+c & d & e. 
+
+A scalar triple product first creates a plane between the vectors in the 
+second half of the arguments, and then performs a dot product on that vector. 
+Because the cross product returns an orthogonal vector to the vectors in the 
+cross product, the closer the absolute value of scalar triple product of a,b,c 
+is to 0, the more allinged vector a is with the plane created by vector b & c 
+
+A = [6,18,5]
+B = [-2,-5,-8]
+C = [2,1,12]
+
+print(f"A * (B X C) {abs(vector_functions.scalar_triple_product(A,B,C))}")
+print(f"C * (A X B) {abs(vector_functions.scalar_triple_product(C,A,B))}")
+print(f"B * (A X C) {abs(vector_functions.scalar_triple_product(B,A,C))}")
+
+Output: 
+    A * (B X C) 128
+    C * (A X B) 128
+    B * (A X C) 128
+\end{verbatim}
+
+\; \newline When a vector is colinear with another vector the dot product will return a product of their 
+magnitudes, $||A|| * ||B X C|| \approx 1044$, the scalar triple product returns 128 meaning that relative 
+to a orthogonal vector to the B C plane created by the cross product, vector A is 
+close to the plane created by vectors B and C. Additionally the scalar triple product is cyclic, 
+meaning that the vectors can be in any orientation and the value will be the same. 
+Qualitatively the vectors are always the same distance and angle apart and therefore 
+it doesnt matter what vectors you choose to be the plane, the scalar triple product will always be the same. 
+
+% Question 2 
+\includepdf[pages=1]{luke_verlangieri_rga.pdf}
+\includepdf[pages=2]{luke_verlangieri_rga.pdf}
+
+\noindent \textbf{Orbital Speed:} \par
+
+\; \newline a. \newline 
+\begin{center}
+    Newton's law of graviation and second law of motion, as well as normal Curtis eqn 1.25
+\end{center} 
+
+\[ 
+    F = ma, \quad F_g = \frac{Gm_1m_2}{r^2}, \quad a_n = \frac{v^2}{\rho}
+\]
+
+All forces acting on the satellite are in the normal direction (pointing toward the center of the earth).
+\[ \Sigma F_n = F_g = ma_n \] after doing some algebra with the functions above, we result in 
+
+\[ 
+    v = \sqrt{\frac{GM}{r}}
+\] 
+
+Where G is the graviational constant, M is the mass of the earth, and r is the orbital raduis of the object
+
+\begin{verbatim}
+b. 
+
+    G = 6.6743 * math.pow(10,-11) # m3/(kg * s^2)
+    MASS_EARTH = 5.972 * math.pow(10,24) # kg
+
+    #returns the velocity in m/s for a object in circular orbit around the earth
+    def circular_orbit_velocity(orbital_r) -> float: 
+    return math.sqrt((G * MASS_EARTH / orbital_r))
+
+\end{verbatim}
+
+\noindent c. \; \linebreak Using the code mentioned in part b, 
+
+\begin{table}[h]              % 'h' means "here" (placement)
+\centering                    % centers the table
+\begin{tabular}{|c|c|c|}      % 3 columns, all centered, with vertical lines
+\hline
+Satellite & Altitude & Orbital Speed \\ \hline
+LEO & 460 km & 7.639 km/s \\ \hline
+MEO & 20,200 km & 3.873 km/s \\ \hline
+GEO & 35,780 km & 3.075 km/s \\ \hline
+\end{tabular}
+\caption{Satellite speeds in orbit}      % table caption
+\label{tab:example}          % reference label
+\end{table}
+
+d. Astronaughts wear the mach 25 patch due to the fact that the ISS flies about mach 25 around the earth,
+its now a staple and memoir of astronaughts.
+
+\pagebreak
+
+\includepdf[pages=1]{ball_cylinder.pdf}
+
+f. \linebreak
+
+Resolving the equation on the previous page for angle, we find that
+
+\[ 
+    \phi = \arccos(\frac{v_0^2+2gr}{3gr})
+\]
+
+When $v_0 = 0$, we find that 
+
+\[ 
+    \phi = \arccos(\frac{2}{3}) = 48.19\deg
+\] 
+
+In python:
+\begin{verbatim}
+    # (v_0^2 + 2gr)/3gr = cos(phi)
+    v_0 = 0
+    lhs = 2/3
+    phi = math.acos(lhs) * 180/math.pi #convert to degrees
+    print(f'Departure Angle : {round(phi,3)}')
+
+    Output:
+        Departure Angle : 48.19
+\end{verbatim}
+
+g. \linebreak
+
+This time, instead resolving the equation for $v_0$ we result in 
+\[ 
+    v_0 = \sqrt{gr(3\cos(\phi) - 2)}
+\]
+
+Plugging this into python 
+\begin{verbatim}
+    #v_0 = sqrt(gr(3cos(phi) - 2))
+
+    g = 9.81 # m/s 
+    phi = 45 * math.pi/180 #convert to radians
+    const = math.sqrt(g * (3*math.cos(phi) - 2)) #compute the solved version
+    print(f'V_0 : {round(const,3)} * r^(1/2)')
+
+    Output:
+        V_0 : 1.091 * r^(1/2)
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+% --------------------------------------------------------------
+%     You don't have to mess with anything below this line.
+% --------------------------------------------------------------
+ 
+\end{document}

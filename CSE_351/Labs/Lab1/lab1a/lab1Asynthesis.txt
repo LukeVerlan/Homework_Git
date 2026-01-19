@@ -1,0 +1,43 @@
+******************************
+* Lab 1a Synthesis Questions *
+******************************
+Name(s): Luke Verlangieri
+NetID(s): lverl23@uw.edu
+
+
+-----------------------------------------------------------
+1) Steps: 
+
+First the pointers needed to point to the same index, the easiest way to do this was to
+point the pointers to first index of the given array. Then in order to move the pointer to
+the next data type index, I added 1 to one of the pointers. For an int, this will scoot the pointer
+4 addresses over, a short 2 address, etc. Pointer subtraction returns the number of elements in 
+between the addresses that pointers hold. Without casting this will return a 1, since we moved forward
+one element worth of memory which can be more than 1 byte. In order to get the byte value we cast both 
+pointers to char pointers (char*) and do pointer subtraction between the greater pointer and the smaller 
+pointer, you get the number of chars inbetween those pointers, which is equivalent to the number of bytes
+
+-----------------------------------------------------------
+2) Explain:
+
+The arguments of swap must both be pointers because if they were not pointers you would be passing copies
+to the function and not references to the actual numbers you want to change. Therefore that memory does not
+swap the integers you put in there. Swap pointers needs a reference to the memory you want to change, otherwise 
+it will just create copies of the values given to it in new memory in order to perform its operations on the values
+
+-----------------------------------------------------------
+3) Positive Impact(s) and Drawback/Limitation(s):
+
+There are good and bad things to starting out with a low level langauge
+
+One immediate upside that I can think of is the fact that low level can be a lot to throw at someones for their 
+first time programming. I for one would have a hard time having to think about pointers and over writing memory. 
+Additionally, memory bugs would be a nightmare because you already dont have a great grasp for what could be going wrong
+and C has terrible error messages compared to other languages. Also, Java syntax is smack dab in the middle of all languages, 
+so I think that learning on that language makes it easier to transfer into other languages. 
+
+An downside of not starting with a low level language however is that you lose out a much more foundational grasp of computing 
+and a more natrual undersatnding of whats going on. This is a "Black Box" approach that is given in the 12x series. I 
+personally would have liked a more low level introduction to things but that might be because I have an interest in this. 
+
+
