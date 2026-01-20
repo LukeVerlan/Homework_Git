@@ -1,0 +1,398 @@
+\documentclass[12pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+
+\pagenumbering{arabic}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{cite,color,comment,xspace}
+\usepackage{caption}
+\captionsetup[figure]{font=small}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{titlesec}
+\usepackage{rotating}
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage{multicol}
+\usepackage[square,numbers]{natbib}
+\setlength{\bibsep}{0pt plus 0.3ex}
+\usepackage[skip=2pt]{caption} % example skip set to 2pt
+\setlength{\belowcaptionskip}{-2mm} % Chosen fairly arbitrarily
+\usepackage{array}
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+\definecolor{darkRed}{rgb}{0.2,0,0.44} 
+
+
+\newcommand*{\vertbar}{\rule[-1ex]{0.5pt}{2.5ex}}
+\newcommand*{\horzbar}{\rule[.5ex]{2.5ex}{0.5pt}}
+
+\newcommand{\workingoutspace}[1]{\vspace{#1cm}}
+\newcommand{\course}{AA312}
+\newcommand{\instructor}{Leung}
+\newcommand{\quarteryear}{Winter 2026}
+\newcommand{\shorttitle}{\course}
+\newcommand{\homeworknumber}{01}
+\newcommand{\Lagr}{\mathcal{L}}
+
+
+\title{\vspace{-2.5truecm}  \bf \course: Structural Vibrations \vspace{-0.5Truecm}
+}
+
+\author{\quarteryear  $\quad\mid\quad$ Homework \homeworknumber\\
+{\small \textbf{Module 1}: Fundamentals of LTI systems}\\
+{\small \textbf{Due Date}: Friday Jan 23th 11:59PM. Submit via Canvas.}\\
+}
+
+\date{} 
+
+
+\lfoot{\quarteryear}
+\lhead{\shorttitle}
+\rhead{Homework \homeworknumber}
+\rfoot{Instructor: \instructor}
+
+
+% \renewcommand{\baselinestretch}{0.94}	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle 
+
+\vspace{-.8cm}
+
+\noindent \textit{As a student of The University of Washington, I shall abide by the University’s Student Conduct Code.}\\
+
+\noindent \text{Name and Signature}: Luke Verlangieri \:{\hspace{12cm}}
+
+\vspace{4mm}
+
+\begin{flushleft}
+\phantom{a}
+\end{flushleft}
+ \vspace{-1.7truecm}
+{\color{darkRed}\rule{\textwidth}{0.05in}}
+\thispagestyle{empty}
+
+\noindent \textbf{Short response problems.} See Canvas Quiz for the short response problems. They are due at the same time as these long-response problems.\\
+
+
+\noindent \textbf{Long response problems.} Answer the following long response problems below. Please keep your work tidy and legible. Points cannot be awarded for disorganized and illegible work.
+
+\begin{enumerate}
+    \item 
+    Given two real-world examples of mechanical dynamical systems that could be modeled with mass(es), spring(s), and damper(s). Provide two diagrams for each system: one illustrating the system itself (e.g., a photo or simplified diagram) and another where you approximate it as a mass-spring-damper system.
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.6\textwidth]{figs/Problem1.png}
+      \caption{Car suspension and Pogo Stick MSD Diagrams}
+      \label{fig:1}
+    \end{figure}
+
+    \newpage
+    \item \textbf{(Solving ODEs using Laplace Transform.)} Solve the following ODEs by taking the Laplace transform, rearrange to get an expression for $X(s)$, and then take the inverse Laplace transform of $X(s)$. 
+    \begin{enumerate}[label=(\alph*)]
+        \item $\ddot{x}(t) + 3\dot{x}(t) + 2x(t) = 0,\: x(0) = 3,\; \dot{x}(0) = 1$ \\
+        \[ 
+          \Lagr\left\{\ddot{x}(t)\right\} + 3\Lagr\left\{\dot{x}(t)\right\} + 2\Lagr\left\{x(t)\right\} = 0 
+        \]
+        \\
+        \[
+          \left( s^2X(s) - sx(0) - \dot{x}(0) \right) + 3\left(sX(s) - x(0)\right) + 2X(s) = 0
+        \]
+        \\
+        \[
+          X(s)\left(s^2 + 3s + 2\right) = x(0)\left(s+3\right) + \dot{x}(0) = 3s + 10
+        \]
+        \\
+        \[
+          X(s) = \frac{3s + 10}{s^2 + 3s + 2} = \frac{3s + 10}{(s+2)(s+1)}
+        \]
+
+        Take Partial Fraction Decomposition
+        \[ 
+          3s + 10 = A(s+1) + B(s+2) 
+        \]
+        Try roots $s = -1, -2$
+        \[ 
+          s = -2 \longrightarrow A = -4
+        \]
+        \[
+          s = -1 \longrightarrow B = 7
+        \]
+        Plug back in to original equation
+        \[
+          X(s) = -\frac{4}{s+2} + \frac{7}{s+1}
+        \]
+        Take inverse Laplace 
+        \[
+          x(t) = -4\Lagr^{-1}\left(\frac{1}{s+2}\right) + 7\Lagr^{-1}\left(\frac{1}{s+1}\right) \\
+          \Longrightarrow x(t) = -4e^{-2t} + 7e^{-t}
+        \] 
+
+        \pagebreak
+
+        \item $\ddot{x}(t) + 4\dot{x}(t) + 5x(t) = u(t)$ where $u(t) = \delta(t)$ is the Dirac delta function, i.e., impulse. Assume zero initial conditions (i.e. $x(0) = 0,\; \dot{x}(0) = 0)$. \\
+        
+        Note: $\Lagr\left\{\delta(t)\right\} = 1$ \\
+
+        \[
+          \Lagr\left\{\ddot{x}(t)\right\} + 4\Lagr\left\{\dot{x}(t)\right\} + 5\Lagr\left\{x(t)\right\} = \Lagr\left\{\delta(t)\right\}
+        \]
+        \\ 
+        \[
+          \left(s^2X(s) - sx(0) - \dot{x}(0)\right) + 4\left(sX(s) - x(0)\right) + 5X(s) = 1
+        \]
+        \\
+        Plug in given boundary conditions and factor
+        \[
+          X(s)\left(s^2 + 4s + 5\right) = 1
+        \]
+        \\
+        \[
+          X(s) = \frac{1}{s^2+4s+s} = \frac{1}{(s+2)^2 + 1}
+        \]
+        \\
+        Apply Frequency shift (a = -2)
+        \[  
+          x(t) = e^{-2t}\Lagr^{-1}\left\{\frac{1}{s^2 + 1}\right\} = e^{-2t}\sin(t)
+        \]
+        \\
+        \[  
+          \Longrightarrow x(t) = e^{-2t}\sin(t)
+        \]
+
+        \pagebreak
+
+        \item Suppose that the solution to the system $\ddot{x}(t) + 4\dot{x}(t) + 5x(t) = 0,\; x(0) = 1,\; \dot{x}(0) = 2$ is $x_\mathrm{init}(t)$. Now, if the system has initial conditions $x(0) = 1,\; \dot{x}(0) = 2$ and also has an impulse input applied at the same initial time, what is the expression for the resulting output? Justify your answer. \\
+        
+        Take the Laplace transform of the function, with an impulse input $\delta(t)$
+        \[
+          \Lagr\left\{\ddot{x}(t)\right\} + 4\Lagr\left\{\dot{x}(t)\right\} + 5\Lagr\left\{x(t)\right\} = \Lagr\left\{\delta(t)\right\}
+        \] 
+        \\
+        Factor and solve for X(s)
+        \[
+          \left(s^2X(s) - sx(0) - \dot{x}(0)\right) + 4\left(sX(s) - x(0)\right) + 5X(s) = 1
+        \]
+        \\
+        \[  
+          X(s) = \frac{x(0)(s+4) + \dot{x}(0) + 1}{s^2 + 4s + 5}
+        \]
+        \\
+        From here the solution can be split up into two parts. the $ +1 $ is a direct result of the impulse response. Therefore we can separate the impulse response term from the no input term in order to get the superposition $X(s) = X_{init}(s) + X_{impulse}(s)$
+        \[
+          X(s) = \frac{x(0)(s+4) + \dot{x}(0)}{s^2 + 4s + 5} + \frac{1}{s^2 + 4s + 5} = X_{init}(s) + X_{impulse}(s) 
+        \]
+        \\
+        Then from the previous question, we know the inverse laplace of $ \frac{1}{s^2 + 4s + 5} $, Hence
+        \[
+          \Longrightarrow x(t) = x_{init}(t) + e^{-2t}\sin(t)
+        \]
+    \end{enumerate}
+    \newpage
+
+
+    \newpage
+    \item \textbf{(Transfer function and system properties.)} Write down the transfer function of the following systems where $x(t)$ is the output, and $u(t)$ is the input. Also, write down their corresponding poles/zeros and whether they are BIBO stable. Provide your working below.
+    \begin{enumerate}[label=(\alph*)]
+        \item $\ddot{x}(t) + \dot{x}(t) - 6x(t) = u(t)$
+
+        \begin{table}[h]
+          \centering
+            \begin{tabular}{cc}
+              Transfer function:  $\frac{1}{(s+3)(s-2)}$ & \\
+              Pole(s):  $2, -3$ &  \\
+              Zero(s):   None &  \\
+              BIBO stable: No & \\
+            \end{tabular}
+        \end{table}
+
+        \[
+          \Lagr\left\{\ddot{x}(t)\right\} + \Lagr\left\{\dot{x}(t)\right\} - 6\Lagr\left\{x(t)\right\} = \Lagr\left\{u(t)\right\}
+        \]
+        \[
+          s^2X(s) + sX(s) - 6X(s) = U(s)
+        \]
+        \[
+          \frac{X(s)}{U(s)} = \frac{1}{s^2 + s - 6} = \frac{1}{(s+3)(s-2)}
+        \]
+        \\
+        The roots to the denominator are -3, and 2. Because 2 is a positive real number, this is not BIBO stable. \\ 
+        
+        \item $\ddot{x}(t) + 4\dot{x}(t) + 29x(t) = u(t)$ 
+
+        \begin{table}[h]
+            \centering
+            \begin{tabular}{cc}
+              Transfer function: $ \frac{1}{s^2 + 4s  + 29} $ & \\
+              Pole(s): $-2 + 5i, -2 - 5i$  &  \\
+              Zero(s):   None &  \\
+              BIBO stable: Yes  &  \\
+            \end{tabular}
+        \end{table}
+        
+        \[ \Lagr\left\{\ddot{x}(t)\right\} + 4\Lagr\left\{\dot{x}(t)\right\} + 29\Lagr\left\{x(t)\right\} = \Lagr\left\{u(t)\right\} \]
+        \[ s^2X(s) + 4sX(s) + 29X(s) = U(s) \]
+        \[ \frac{X(s)}{U(s)} = \frac{1}{s^2 + 4s  + 29} \] 
+        \\ 
+        Use the quadratic formula to solve for the roots
+        \[ \frac{(-4)}{2} \pm \frac{\sqrt{16 - 116}}{2} \Longrightarrow -2 \pm 5i \]
+        \\
+        All roots have negative real parts, therefore this is BIBO stable
+
+    \end{enumerate}
+
+    
+    \newpage
+    \item \textbf{(Modeling and natural frequency.)}
+    A control pedal of an aircraft can be modeled as a single-degree-of-freedom system shown in Figure~\ref{fig:pedal}. Consider the lever as a massless shaft and the pedal at the bottom as a lumped mass at the end of the shaft (that is, ignore the exact shape of the pedal and treat it like a point mass).
+    Assume the spring to be unstretched at $\theta = 0$, acceleration due to gravity $g$ is pointing down. \textit{Positive rotation is clockwise}.
+    
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{figs/hw1_pedal.png}
+        \caption{A simple model of a control pedal of an aircraft.}
+        \label{fig:pedal}
+    \end{figure}
+    
+    
+    \begin{enumerate}[label=(\alph*)]
+        \item What is the equation of motion describing $\theta$? And what is the corresponding natural frequency $\omega_n$? Assume small angle approximation. Do not neglect gravity. Recall that the moment of inertia for a point mass with mass $m$ at a distance $\ell$ away from the axis of rotation is $m\ell^2$.
+    \end{enumerate}
+
+    
+    \newpage 
+    \item \textbf{(Modeling and natural frequency.)}
+    Consider an aircraft wing with a fuel pod mounted on its tip. An illustration of the wing and fuel pod is shown in Figure~\ref{fig:aircraft wing and fuel pod}. The pod has a mass of 20kg when it is empty, and 2000kg when it is full. Calculate the change in the natural frequency of vibration of the wing as the aircraft uses up the fuel in the wing pod (from full to empty). The estimated physical parameters of the beam are: $I=5.2 \times 10^{-5}$m$^4$, $E=6.9 \times 10^9$Nm$^{-2}$, and $\ell=2$m.
+
+    Are there any issues that you may need to consider as an engineer working on other components of this aircraft?
+
+    \begin{figure}[h]
+    \centering
+        \includegraphics[width=0.9\textwidth]{figs/hw1_aircraft.png}
+        \caption{Figure of aircraft and field pod on its wing.}
+        \label{fig:aircraft wing and fuel pod}
+    \end{figure}
+
+
+    \newpage
+    \item \textbf{(Past exam problem.)}
+    Your engineering firm is tasked with designing the suspension system of a moon lander spacecraft, shown in Figure~\ref{fig:spacecraft}. The suspension system consists of two \textit{identical} spring-damper systems.
+    The spacecraft is carrying an extremely delicate payload that cannot experience any oscillation whatsoever otherwise it will break. Your task as the vibrations engineer in the firm is to design the suspension system to ensure no oscillations occur during landing.
+    
+    Assume that the landing pads touch the ground simultaneously and once they touch the ground, they remain rigidly attached to the ground and will not move or slip. Zero vertical displacement of the spacecraft ($y=0$) is defined when the spacecraft is just about to touch the ground and the suspension system is not yet compressed.
+    
+    
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{figs/hw1_spacecraft.png}
+        \caption{Moon lander spacecraft with a double suspension system.}
+        \label{fig:spacecraft}
+    \end{figure}
+    
+    \begin{enumerate}[label=(\alph*)]
+        \item What is the equation of motion describing the vertical displacement $y$ of the spacecraft right after the pads make contact with the ground? 
+        Do not neglect acceleration due to gravity $g\,\mathrm{ms}^{-2}$.
+        \workingoutspace{5}
+    
+        \item Let $\dot{y}_0$ denote the vertical velocity of the spacecraft right before it touches the surface. If $Y(s)$ is the Laplace transform of $y(t)$, i.e., $Y(s) = \mathcal{L}\{y(t)\}$, then show that 
+        \[Y(s) = \dfrac{1}{s}\cdot\dfrac{g}{s^2 + \frac{2b}{m}s + \frac{2k}{m}} + \dfrac{\dot{y}_0}{s^2 + \frac{2b}{m}s + \frac{2k}{m}}.\]
+
+    
+        \item For the spacecraft to experience \textit{no oscillations} when it lands, what are some constraints on $b$, $m$, and $k$?
+
+    
+        \item You find that the mass of the spacecraft is 10kg (it is a small spacecraft!) and that the only springs and dampers that are certified to operate in space have coefficients $k=3\,\mathrm{kgs}^{-2}$ and $b=4\,\mathrm{kgs}^{-1}$. Unfortunately, you find that these spring and damping coefficients lead to the spacecraft oscillating. But you decide to get creative and create ``new'' springs by combining \textit{two} springs either in series $k_\mathrm{s}$ or in parallel $k_\mathrm{p}$. Similarly, you can create ``new'' dampers by combining \textit{two} dampers either in series $b_\mathrm{s}$ or in parallel $b_\mathrm{p}$.
+        With more spring and damper options available, is there a feasible design that prevents the spacecraft from oscillating? If no, write no. If yes, from the set of possible combinations illustrated below, circle which combination(s) is(are) feasible. Briefly justify your answer.
+        
+        \textbf{Remark 1}: Both suspension systems must be identical and use the same spring and damper combination.     
+        \textbf{Remark 2}: In the figures below, only one of the suspensions is illustrated.    
+        \textbf{Remark 3}: Placing dampers in parallel/series follows the same formulas as placing springs in parallel/series.
+    \end{enumerate}
+    
+    \begin{figure}[h]
+        \centering
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bkp.png}
+          \caption{Single damper, parallel spring. ($b, k_p$)}
+          \label{fig:bkp}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bks.png}
+          \caption{Single damper, series spring. ($b, k_s$)}
+          \label{fig:bks}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bpk.png}
+          \caption{Parallel damper, single spring. ($b_p, k$)}
+          \label{fig:bpk}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bsk.png}
+          \caption{Series damper, single spring. ($b_s, k$)}
+          \label{fig:bsk}
+        \end{subfigure}\\
+        \vspace{10mm}
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bpkp.png}
+          \caption{Parallel damper, parallel spring. ($b_p, k_p$)}
+          \label{fig:bpkp}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bpks.png}
+          \caption{Parallel damper, series spring. ($b_p, k_s$)}
+          \label{fig:bpks}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bskp.png}
+          \caption{Series damper, parallel spring. ($b_s, k_p$)}
+          \label{fig:bskp}
+        \end{subfigure}%
+        \hfill
+        \begin{subfigure}{0.22\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{figs/bsks.png}
+          \caption{Series damper, series spring. ($b_s, k_s$)}
+          \label{fig:bsks}
+        \end{subfigure}
+        \vspace{2mm}
+        % \caption{The research goal is to develop ego-centric evaluation metrics for determining how effectively autonomous mobile robots navigate safely and fluently in dense human crowds.}
+        \label{fig:key figures}
+    \end{figure}
+    
+
+    
+    \newpage 
+    \item \textbf{(Optional, ungraded)} Prove the following Laplace identities.
+        \begin{enumerate}[label=(\alph*)]
+            
+            \item $\mathcal{L}[f(ct)] = \frac{1}{c}F(\frac{s}{c})$ 
+
+            \item $\mathcal{L}[\int_0^t f(v)dv] = \frac{F(s)}{s}$. Hint: Let $g(t) = \int_0^t f(v)dv$ and $g^\prime(t) = f(t)$ (by the Fundamental Theorem of Calculus). 
+        \end{enumerate}
+\end{enumerate}
+
+
+\end{document}
+
+
