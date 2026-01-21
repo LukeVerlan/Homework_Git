@@ -157,7 +157,7 @@
         \]
         \\
         \[
-          X(s) = \frac{1}{s^2+4s+s} = \frac{1}{(s+2)^2 + 1}
+          X(s) = \frac{1}{s^2+4s+5} = \frac{1}{(s+2)^2 + 1}
         \]
         \\
         Apply Frequency shift (a = -2)
@@ -265,7 +265,13 @@
     
     
     \begin{enumerate}[label=(\alph*)]
-        \item What is the equation of motion describing $\theta$? And what is the corresponding natural frequency $\omega_n$? Assume small angle approximation. Do not neglect gravity. Recall that the moment of inertia for a point mass with mass $m$ at a distance $\ell$ away from the axis of rotation is $m\ell^2$.
+        \item What is the equation of motion describing $\theta$? And what is the corresponding natural frequency $\omega_n$? Assume small angle approximation. Do not neglect gravity. Recall that the moment of inertia for a point mass with mass $m$ at a distance $\ell$ away from the axis of rotation is $m\ell^2$. \\\\
+        Looking at the given system, only two forces act on the hinged beam on a given rotation of the pedal. $F_{spring} = k\Delta$ acting to the left on segment $l_1$. $F_{gravity} = mg$ acting on the pedal on segment $l_2$. The magnitude of force delivered by the spring is given by $F_{spring} = k\theta l_1$, since total displacement of the spring is
+        the arc length of the rotation of the beam. Because we are looking for the equation of motion of $\theta$, we need to relate these forces using the moment about the hinge. Because $\theta$ is positive clockwise, the moment is positive clockwise. Hence,
+        \[ \Sigma M = I\ddot{\theta} = ml^2_2\ddot{\theta} = -mgl_2\sin(\theta) - kl^2_1\theta\cos(\theta) \] Applying the small angle approximation $\cos(\theta) \approx 1, \sin(\theta) \approx \theta$, and moving terms to the other side, we get the equation of motion describing $\theta$. 
+        \[ \Longrightarrow ml^2_2\ddot{\theta} + mgl_2\theta + kl^2_1\theta = ml^2_2\ddot{\theta} + \left(mgl_2+ kl^2_1\right)\theta = 0 \] we can solve for the natural frequency $w_n$ by treating this system as an MSD (Mass, Spring, Damper) system. For an MSD system $w_n = \sqrt{\frac{k}{m}}$. Hence the natrual frequency of this system is given by
+        \[ \Longrightarrow w_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{mgl_2 + kl_1^2}{ml_2^2}} \]
+
     \end{enumerate}
 
     
@@ -282,6 +288,13 @@
         \label{fig:aircraft wing and fuel pod}
     \end{figure}
 
+    From lecture, we know that the approximate spring constant of a beam with a point mass on the end is given by $\frac{3EI}{l^3}$. \\
+    \[ \Sigma F = m \ddot{x} = mg - kx \longrightarrow m\ddot{x} + kx = mg \] Treating the wing as an MSD system, the natural frequency $w_n$ is given by $\sqrt{\frac{k}{m}}$. Hence
+    \[ w_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{3EI}{l^3m}} \] Because only the mass changes during the flight \[ \Delta w_n = \sqrt{\frac{3EI}{l^3\Delta m}} = \sqrt{\frac{3EI}{l^3}} \left(\frac{1}{\sqrt{m_{empty}}} - \frac{1}{\sqrt{m_{full}}}\right) \] 
+    Hence
+    \[ \Longrightarrow \Delta w_n = \sqrt{\frac{3(6.9 * 10^9 \left[\frac{N}{m^2}\right])(5.2*10^{-5}\left[m^4\right])}{(2 \left[m\right])^3}}\left(\frac{1}{\sqrt{200 \left[kg\right]}} - \frac{1}{\sqrt{2000 \left[kg \right]}}\right) = 17.74 \left[\frac{rad}{s}\right] \] 
+    Or $2.82 \left[Hz\right]$. Other engineers working on this aircraft need to be aware of this as to not contstruct a system that has a resonant frequency between the range of the natural frequencies the wing has throughout the flight. Doing this could lead to uncontrollable vibrations due to said resonance in the given system
+    and in result cause catastrophic failure of the plane.
 
     \newpage
     \item \textbf{(Past exam problem.)}
@@ -300,18 +313,36 @@
     
     \begin{enumerate}[label=(\alph*)]
         \item What is the equation of motion describing the vertical displacement $y$ of the spacecraft right after the pads make contact with the ground? 
-        Do not neglect acceleration due to gravity $g\,\mathrm{ms}^{-2}$.
-        \workingoutspace{5}
+        Do not neglect acceleration due to gravity $g\,\mathrm{ms}^{-2}$. \\\\
+        Because the systems are identical, and are in parallel, the dampers and springs can be added together to form one damper and spring system with damper and spring constant 2b and 2k respectively. 
+        With this in mind, we can take a sum of forces on the body to find the equation of motion.
+        \[ \Sigma F = m\ddot{y} = mg - 2ky - 2b\dot{y} \] 
+        With some rearrangement, we find the equation of motion to be 
+        \[ \Longrightarrow m\ddot{y} + 2b\dot{y} + 2ky = mg \]
+
+        \pagebreak
     
         \item Let $\dot{y}_0$ denote the vertical velocity of the spacecraft right before it touches the surface. If $Y(s)$ is the Laplace transform of $y(t)$, i.e., $Y(s) = \mathcal{L}\{y(t)\}$, then show that 
-        \[Y(s) = \dfrac{1}{s}\cdot\dfrac{g}{s^2 + \frac{2b}{m}s + \frac{2k}{m}} + \dfrac{\dot{y}_0}{s^2 + \frac{2b}{m}s + \frac{2k}{m}}.\]
+        \[Y(s) = \dfrac{1}{s}\cdot\dfrac{g}{s^2 + \frac{2b}{m}s + \frac{2k}{m}} + \dfrac{\dot{y}_0}{s^2 + \frac{2b}{m}s + \frac{2k}{m}}.\] \\
+        Start by taking the Laplace transform of the equation of motion
+        \[ \Lagr\left\{mg\right\} = m\Lagr\left\{\ddot{y}\right\} + 2b\Lagr\left\{\dot{y}\right\} + 2k\Lagr\left\{y\right\} \] 
+        \[ \frac{mg}{s} = m(s^2Y(s) - sy(0) - \dot{y}_0) + 2b(sY(s) - y(0)) + 2kY(s) \]
+        Plug in initial conditions and rearrange
+        \[ \frac{mg}{s} = Y(s)(ms^2 + 2bs + 2k) - m\dot{y}_0 \longrightarrow \frac{1}{s}g + \dot{y}_0 = Y(s)(s^2 + \frac{2b}{m}s + \frac{2k}{m}) \]
+        \[ \Longrightarrow \frac{1}{s} * \frac{g}{s^2 + \frac{2b}{m}s + \frac{2k}{m}} + \frac{\dot{y}_0}{s^2 + \frac{2b}{m}s + \frac{2k}{m}} \]
 
-    
-        \item For the spacecraft to experience \textit{no oscillations} when it lands, what are some constraints on $b$, $m$, and $k$?
+        \item For the spacecraft to experience \textit{no oscillations} when it lands, what are some constraints on $b$, $m$, and $k$? \\\\
+        In order to have zero oscillations upon landing, the system must be at least critically damped, as to say that the damping ratio ($\zeta$) must be $\geq 1$ \\ 
 
+        We can model the spacecrafts suspension as an MSD system, and therefore the damping ratio is given by $\zeta = \frac{c}{2\sqrt{km}} = \frac{2b}{2m\sqrt{\frac{2k}{m}}}$. Which simplifies to the inequality
+        \[ \Longrightarrow \zeta = \frac{b}{\sqrt{2km}} \geq 1 \]
+
+        \pagebreak
     
         \item You find that the mass of the spacecraft is 10kg (it is a small spacecraft!) and that the only springs and dampers that are certified to operate in space have coefficients $k=3\,\mathrm{kgs}^{-2}$ and $b=4\,\mathrm{kgs}^{-1}$. Unfortunately, you find that these spring and damping coefficients lead to the spacecraft oscillating. But you decide to get creative and create ``new'' springs by combining \textit{two} springs either in series $k_\mathrm{s}$ or in parallel $k_\mathrm{p}$. Similarly, you can create ``new'' dampers by combining \textit{two} dampers either in series $b_\mathrm{s}$ or in parallel $b_\mathrm{p}$.
         With more spring and damper options available, is there a feasible design that prevents the spacecraft from oscillating? If no, write no. If yes, from the set of possible combinations illustrated below, circle which combination(s) is(are) feasible. Briefly justify your answer.
+
+
         
         \textbf{Remark 1}: Both suspension systems must be identical and use the same spring and damper combination.     
         \textbf{Remark 2}: In the figures below, only one of the suspensions is illustrated.    
@@ -380,16 +411,63 @@
         \label{fig:key figures}
     \end{figure}
     
+        First we can identify the equivalent spring and damper constants of both the series and parallel variations.
+        \[k_p = 2k = 6 \left[\frac{kg}{s^2}\right] \quad k_s = \frac{1}{\frac{2}{k}} = \frac{k}{2} = \frac{3}{2} \left[\frac{kg}{s^2}\right] \]
+        \[b_p = 2b = 8 \left[\frac{kg}{s}\right] \quad b_s = \frac{b}{2} = 2 \left[\frac{kg}{s}\right] \] \\
+        From here it is as simple as checking each case to see if it fulfills the criteria found in the previous question. Instead of punching all of the numbers into a calculator I wrote a python script to do it instead. 
+        The condition is still \[ \frac{b}{\sqrt{2km}} \geq 1 \]. 
+
+        \begin{verbatim}
+m = 10
+kp = 6
+ks = 3/2
+bp = 8
+bs = 2
+k = 3
+b = 4
+
+options = [
+# k, b, option letter
+(kp, b, ’a’),
+(ks, b, ’b’),
+(k, bp, ’c’),
+(k, bs, ’d’),
+(kp, bp, ’e’),
+(ks, bp, ’f’),
+(kp, bs, ’g’),
+(ks, bs, ’h’)
+]
+
+def condition(K, B): return B/math.sqrt(2*K*m)
+
+print("Successful Options:")
+for option in options:
+  if condition(option[0], option[1]) >= 1: print(f" {option[2]}")
+
+OUTPUT:
+Successful Options:
+c
+f 
+        \end{verbatim}
+        As can be seen from the file output, the options that would work for the given MSD systems are options \textbf{C \& F}.
 
     
     \newpage 
     \item \textbf{(Optional, ungraded)} Prove the following Laplace identities.
         \begin{enumerate}[label=(\alph*)]
             
-            \item $\mathcal{L}[f(ct)] = \frac{1}{c}F(\frac{s}{c})$ 
+            \item $\mathcal{L}[f(ct)] = \frac{1}{c}F(\frac{s}{c})$
+            
+            \[ \Lagr\left\{f(ct)\right\} = \int_{0}^{\infty} e^{-st} f(ct) dt \]
+            Take $u = ct \longrightarrow t = \frac{u}{c}$
+            \[ \frac{1}{c} \int_{0}^{\infty} e^{\frac{-su}{c}} f(u) du = \frac{1}{c} \int_{0}^{\infty} e^{-\left(\frac{s}{c}\right)u} f(u) du \]
+            \[ \Longrightarrow \frac{1}{c}F\left(\frac{s}{c}\right)\] 
 
-            \item $\mathcal{L}[\int_0^t f(v)dv] = \frac{F(s)}{s}$. Hint: Let $g(t) = \int_0^t f(v)dv$ and $g^\prime(t) = f(t)$ (by the Fundamental Theorem of Calculus). 
-        \end{enumerate}
+            \item $\mathcal{L}[\int_0^t f(v)dv] = \frac{F(s)}{s}$. Hint: Let $g(t) = \int_0^t f(v)dv$ and $g^\prime(t) = f(t)$ (by the Fundamental Theorem of Calculus). \\\\
+            \[ g(t) = \int_{0}^{t} f(v) dv \quad \& \quad \frac{dg}{dt} = f(t) \]
+            \[ \Lagr\left\{\frac{dg}{dt}\right\} = sG(s) - g(0) = sG(s) - \int_{0}^{0} f(v)dv \]
+            \[ \Longrightarrow \frac{\Lagr\left\{f(t)\right\}}{s} = \frac{F(s)}{s} = G(s) = \Lagr\left\{\int_{0}^{t} f(v) dv\right\} \]
+\end{enumerate}
 \end{enumerate}
 
 
