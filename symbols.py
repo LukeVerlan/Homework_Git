@@ -1,2 +1,5 @@
 sigma = 'σ'
 tau   = 'τ'
+mu = 'μ'
+epsilon ='ϵ'
+gamma ='γ'
