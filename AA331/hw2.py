@@ -18,8 +18,6 @@ def problem_1_3():
         et.print_state(stress_state, label = f"State No. {i+1}")
         et.mohrs_circle_plot(stress_state, title=f"State No. {i+1}")
 
-    
-
 def problem_1_1():
     sig_x = 80
     sig_y = 0
