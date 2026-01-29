@@ -131,6 +131,12 @@ def mohrs_strain_circle_plot(strain_state, title=""):
         ylabel=f'Shear Strain {sym.gamma}/2', xsym=sym.epsilon, ysym=sym.gamma
     )
 
+
+# =======================================
+#      UNIVERSIAL HELPER FUNCTIONS
+# =======================================
+
+
 def circle_plot(x, y, xy, r, avg, 
                 title='', units='',
                 xlabel='', ylabel='',
