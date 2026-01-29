@@ -1,5 +1,5 @@
 import math
-import numpy
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.patches import Circle
 
@@ -45,66 +45,12 @@ def print_state(state, label=None):
 
 def mohrs_circle_plot(stress_state, title=""):
 
-    OFFSET = stress_state['tau_max'][0]/10
-    
-    if stress_state['sig_y'][0] > stress_state['sig_x'][0]:
-        sx_offset = -OFFSET
-        sy_offset = OFFSET
-    else: 
-        sx_offset = OFFSET
-        sy_offset = -OFFSET
-
-    t_offset = OFFSET
-
-    fig, ax = plt.subplots(figsize=(6, 6)) 
-
-    stress_units = stress_state['sig_1'][1]
-
-    ax.set_title(title, fontweight='bold')
-    ax.set_ylabel(f"Shear Stress ({sym.tau}), {stress_units}")
-    ax.set_xlabel(f"Normal Stress ({sym.sigma}), {stress_units}")
-    
-    ax.invert_yaxis()
-
-    ax.axhline(0, color='black', linewidth=1.5, zorder=2)
-    ax.axvline(0, color='black', linewidth=1.5, zorder=2)
-    ax.grid(True, linestyle='--', alpha=0.6, zorder=1)
-
-    # Circle Base
-    avg_stress = stress_state['sig_avg'][0]
-    radius = stress_state['tau_max'][0]
-    
-    circle = Circle((avg_stress, 0), radius, color='blue', fill=False, linewidth=2.5, zorder=3)
-    ax.add_patch(circle)
-
-    sig_coords = [ stress_state['sig_y'][0], stress_state['sig_x'][0]]
-    tau_coords = [-stress_state['tau_xy'][0], stress_state['tau_xy'][0]]
-    ax.plot(sig_coords, tau_coords, color='red', linestyle='-', linewidth=2, zorder=4)
-
-    padding = radius * 0.2
-    ax.set_xlim(avg_stress - radius - padding, avg_stress + radius + padding)
-    ax.set_ylim(radius + padding, -radius - padding)
-
-    # Key points
-    ax.plot(stress_state['sig_x'][0], stress_state['tau_xy'][0], marker='o', color='red')
-    ax.annotate(f'{sym.sigma}x', xy=((stress_state['sig_x'][0], stress_state['tau_xy'][0])), 
-                xytext=((stress_state['sig_x'][0]+ sx_offset, stress_state['tau_xy'][0]+ t_offset)))
-
-    ax.plot( stress_state['sig_y'][0], -stress_state['tau_xy'][0], marker='o', color='red')
-    ax.annotate(f'{sym.sigma}y', xy=((stress_state['sig_y'][0], -stress_state['tau_xy'][0])), 
-                xytext=((stress_state['sig_y'][0]+ sy_offset, -stress_state['tau_xy'][0]- t_offset)))
-    
-    ax.plot( stress_state['sig_avg'][0], 0, marker='o', color='red')
-    ax.annotate(f'{sym.sigma}avg', xy=((stress_state['sig_avg'][0], 0)), 
-                xytext=((stress_state['sig_avg'][0], sy_offset)))
-    
-    ax.plot( stress_state['sig_avg'][0], stress_state['tau_max'][0], marker='o', color='red')
-    ax.annotate(f'{sym.tau}max', xy=((stress_state['sig_avg'][0], stress_state['tau_max'][0])), 
-                xytext=((stress_state['sig_avg'][0], stress_state['tau_max'][0] + t_offset)))
-
-    ax.set_aspect('equal', adjustable='box')
-    plt.tight_layout()
-    plt.show()
+    circle_plot(
+        stress_state['sig_x'][0], stress_state['sig_y'][0], stress_state['tau_xy'][0],
+        stress_state['tau_max'][0], stress_state['sig_avg'][0], title=title,
+        units=stress_state['sig_x'][1], xlabel=f'Normal stress ({sym.sigma})',
+        ylabel=f'Shear Stress {sym.tau}', xsym=sym.sigma, ysym=sym.tau
+    )
 
 # Assumes a circular rod J = pi * r**4 / 2
 # Assumes x is axial
@@ -120,6 +66,12 @@ def print_axial_torsional_loading(stress_state, r, stress_scale_factor):
 # =======================================
 #               STRAIN
 # =======================================
+
+# Assumes 2 gauges are perpendicular, and the 3rd is an angle theta from the x axis
+def get_shear_strain_from_rosette(e3, angle, ex, ey, deg=True):
+    if deg: angle = np.deg2rad(angle)
+    return 2 * (e3 - ex * (math.cos(angle)**2) - ey * (math.sin(angle)**2)) / (math.sin(2*angle))
+
 
 
 def plane_strain_state(ex, ey, y_xy, strain_units='', angle_units='deg'):
@@ -146,91 +98,93 @@ def plane_strain_state(ex, ey, y_xy, strain_units='', angle_units='deg'):
 
     return state
 
-# Expects E in si units
+# Expects SI units
 def plane_strain_to_stress(strain_state, E, v):
-    if strain_state['ex'][1] != sym.mu: fac = 1
-    else:                               fac = pow(10, -6)
-    G = E / (2*(1+v))
+
+    if strain_state['ex'][1] == sym.mu:
+        fac = 1e-6
+    else:
+        fac = 1.0
+        
+    G = E / (2 * (1 + v))
     
-    # returns sig1
-    def strain_to_stess(e1, e2): return E * fac * (e1 + v * e2) / (1 - (v**2))
+    def calc_normal_stress(e1, e2): return (E / (1 - v**2)) * (e1 * fac + v * (e2 * fac))
 
-    sigy = strain_to_stess(
-        strain_state['ey'][0], strain_state['ex'][0]
-    ) * pow(10, -6)
+    sigx_pa = calc_normal_stress(strain_state['ex'][0], strain_state['ey'][0])
+    sigy_pa = calc_normal_stress(strain_state['ey'][0], strain_state['ex'][0])
 
-    sigx = strain_to_stess(
-        strain_state['ex'][0], strain_state['ey'][0]
-    ) * pow(10, -6)
-
-    t_xy = strain_state['y_xy'][0] * fac * G * pow(10, -6) 
+    txy_pa = G * (strain_state['y_xy'][0] * fac)
 
     return plane_stress_state(
-        sigx, sigy, t_xy, 'MPa'
+        sigx_pa / 1e6, 
+        sigy_pa / 1e6, 
+        txy_pa / 1e6, 
+        'MPa'
     )
 
 def mohrs_strain_circle_plot(strain_state, title=""):
 
-    OFFSET = strain_state['y_max'][0]/20
+    circle_plot(
+        strain_state['ex'][0], strain_state['ey'][0], strain_state['y_xy'][0]/2,
+        strain_state['y_max'][0]/2, strain_state['eavg'][0], title=title,
+        units=strain_state['ex'][1], xlabel=f'Normal Strain ({sym.epsilon})',
+        ylabel=f'Shear Strain {sym.gamma}/2', xsym=sym.epsilon, ysym=sym.gamma
+    )
+
+def circle_plot(x, y, xy, r, avg, 
+                title='', units='',
+                xlabel='', ylabel='',
+                xsym='', ysym=''):
+    OFFSET = r/10
     
-    if strain_state['ey'][0] > strain_state['ex'][0]:
-        sx_offset = -OFFSET
-        sy_offset = OFFSET
+    if y > x:
+        x_offset = -OFFSET
+        y_offset = OFFSET
     else: 
-        sx_offset = OFFSET
-        sy_offset = -OFFSET
+        x_offset = OFFSET
+        y_offset = -OFFSET
 
     t_offset = OFFSET
 
     fig, ax = plt.subplots(figsize=(6, 6)) 
 
-    strain_units = strain_state['ex'][1]
-
     ax.set_title(title, fontweight='bold')
-    ax.set_ylabel(f"Shear Strain ({sym.gamma}/2), {strain_units}")
-    ax.set_xlabel(f"Normal Strain ({sym.epsilon}), {strain_units}")
+    ax.set_ylabel(f"{ylabel}, {units}")
+    ax.set_xlabel(f'{xlabel}, {units}')
     
     ax.invert_yaxis()
 
     ax.axhline(0, color='black', linewidth=1.5, zorder=2)
     ax.axvline(0, color='black', linewidth=1.5, zorder=2)
     ax.grid(True, linestyle='--', alpha=0.6, zorder=1)
-
-    # Circle Base
-    avg_strain = strain_state['eavg'][0]
-    radius = strain_state['y_max'][0]/2
     
-    circle = Circle((avg_strain, 0), radius, color='blue', fill=False, linewidth=2.5, zorder=3)
+    circle = Circle((avg, 0), r, color='blue', fill=False, linewidth=2.5, zorder=3)
     ax.add_patch(circle)
 
-    ey = strain_state['ey'][0]
-    ex = strain_state['ex'][0]
-    yxy = strain_state['y_xy'][0]/2
+    xcoords = [ y, x ]
+    ycoords = [-xy, xy]
+    ax.plot(xcoords, ycoords, color='red', linestyle='-', linewidth=2, zorder=4)
 
-    sig_coords = [ ey, ex ]
-    tau_coords = [-yxy, yxy]
-    ax.plot(sig_coords, tau_coords, color='red', linestyle='-', linewidth=2, zorder=4)
-
-    padding = radius * 0.2
-    ax.set_xlim(avg_strain - radius - padding,  avg_strain + radius + padding)
-    ax.set_ylim(radius + padding, -radius - padding)
+    padding = r * 0.2
+    ax.set_xlim(avg - r - padding,  avg + r + padding)
+    ax.set_ylim(r + padding, -r - padding)
 
     # Key points
-    ax.plot(ex, yxy, marker='o', color='red')
-    ax.annotate(f'{sym.epsilon}x', xy=((ex, yxy)), 
-                xytext=((ex + sx_offset, yxy + t_offset)))
+    ax.plot(x, xy, marker='o', color='red')
+    ax.annotate(f'{xsym}x', xy=((x, xy)), 
+                xytext=((x + x_offset, xy + t_offset)))
 
-    ax.plot( ey , -yxy, marker='o', color='red')
-    ax.annotate(f'{sym.epsilon}y', xy=((ey, -yxy)), 
-                xytext=((ey + sy_offset, -yxy - t_offset)))
+    ax.plot( y , -xy, marker='o', color='red')
+    ax.annotate(f'{xsym}y', xy=((y, -xy)), 
+                xytext=((y + y_offset, -xy - t_offset)))
     
-    ax.plot( avg_strain, 0, marker='o', color='red')
-    ax.annotate(f'{sym.epsilon}avg', xy=((avg_strain, 0)), 
-                xytext=((avg_strain, sy_offset)))
+    ax.plot( avg, 0, marker='o', color='red')
+    ax.annotate(f'{xsym}avg', xy=((avg, 0)), 
+                xytext=((avg, y_offset)))
     
-    ax.plot( avg_strain, radius, marker='o', color='red')
-    ax.annotate(f'{sym.gamma}max/2', xy=((avg_strain, radius)), 
-                xytext=((avg_strain, radius + t_offset)))
+    ax.plot( avg, r, marker='o', color='red')
+    ax.annotate(f'{ysym}max/2', xy=((avg, r)), 
+                xytext=((avg, r + t_offset)))
 
     ax.set_aspect('equal', adjustable='box')
     plt.tight_layout()

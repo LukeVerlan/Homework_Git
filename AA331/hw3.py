@@ -75,9 +75,41 @@ def problem_3_b():
     
     plt.show()
 
+def problem_4():
+    E = 73 * pow(10,9)
+    v = 0.3
+
+    ex = 3657 #mu
+    ey = -1245 
+    e3 = 956
+    theta = 45
+    
+    yxy = et.get_shear_strain_from_rosette(
+        e3, theta, ex, ey
+    )
+
+    strain_state = et.plane_strain_state(
+        ex, ey, yxy, strain_units=sym.mu
+    )
+
+    et.print_state(
+        strain_state, label='Strain State'
+    )
+
+    et.mohrs_strain_circle_plot(
+        strain_state, title='Strain Circle'
+    )
+
+    stress_state = et.plane_strain_to_stress(
+        strain_state, E, v
+    )
+
+    et.print_state(
+        stress_state, label='Stress State'
+    )
 
 def main():
-    problem_3_b()
+    problem_4()
 
 if __name__ == '__main__':
     main()
